@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
@@ -27,6 +28,7 @@ import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 import SportsIcon from "@mui/icons-material/Sports";
 import TimerIcon from "@mui/icons-material/Timer";
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import Link from "next/link";
 
 const drawerWidth = 240;
 
@@ -96,6 +98,11 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export default function Layout({ children }) {
+  const router = useRouter()
+  const pathname = usePathname();
+  const theme = useTheme();
+  const [open, setOpen] = useState(false);
+
   const icons = {
     "Modify Website": <BuildIcon />,
     "Settings": <SettingsIcon />,
@@ -107,9 +114,6 @@ export default function Layout({ children }) {
     "Payments": <PaymentsIcon />,
     "Dashboard": <DashboardIcon />
   };
-
-  const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -137,7 +141,7 @@ export default function Layout({ children }) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" bac>
-            Admin Dashboard
+            <Link href='/dashboard'>Admin Dashboard</Link>
           </Typography>
         </Toolbar>
       </AppBar>
@@ -153,16 +157,21 @@ export default function Layout({ children }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {["Dashboard", "Inbox", "Trainees", "Coaches", "Sessions", "Payments"].map(
-            (text, index) => (
-              <ListItem key={text} disablePadding sx={{ display: "block" }}>
-                <ListItemButton
+          {["Dashboard", "Inbox", "Trainees", "Payments" , "Sessions", "Coaches"].map(
+            (text, index) => {
+              let href = `/dashboard${text==="Dashboard"?"":'/'+text.toLowerCase()}`
+
+              return <ListItem key={text} component={Link} disablePadding sx={{ display: "block" }}
+              href={href} 
+              className={href === pathname? 'bg-green-100':''}
+              >
+                <ListItemButton 
                   sx={{
                     minHeight: 48,
                     justifyContent: open ? "initial" : "center",
                     px: 2.5,
                   }}
-                >
+                > 
                   <ListItemIcon
                     sx={{
                       minWidth: 0,
@@ -175,14 +184,14 @@ export default function Layout({ children }) {
                   <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
                 </ListItemButton>
               </ListItem>
-            )
+            }
           )}
         </List>
         <Divider />
         <List>
-          {["Modify Website", "Settings", "Logout"].map((item, index) => (
+          {["Modify Website", "Settings", "Logout"].map((text, index) => (
             <ListItem key={index} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
+              <ListItemButton onClick={()=>router.push(`/dashboard/${text.toLowerCase()}`)}
                 sx={{
                   minHeight: 48,
                   justifyContent: open ? "initial" : "center",
@@ -196,9 +205,9 @@ export default function Layout({ children }) {
                     justifyContent: "center",
                   }}
                 >
-                  {icons[item]}
+                  {icons[text]}
                 </ListItemIcon>
-                <ListItemText primary={item} sx={{ opacity: open ? 1 : 0 }} />
+                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>
             </ListItem>
           ))}

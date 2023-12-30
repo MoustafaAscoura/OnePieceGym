@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link';
 import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import { Button, InputBase, Toolbar, Box, AppBar, IconButton } from '@mui/material';
@@ -51,7 +52,7 @@ export default function SearchBar() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" >
         <Toolbar className='justify-between bg-green-300 text-black'>
-          <Button variant="outlined" color="success">Add New</Button>
+          <Button component={Link} href='/dashboard/trainees/new' variant="outlined" color="success">Add New</Button>
 
           <Search>
             <SearchIconWrapper>

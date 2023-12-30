@@ -26,9 +26,9 @@ export default function BasicTable() {
         <TableHead>
           <TableRow>
             <TableCell>Trainee</TableCell>
-            <TableCell align="right">Plan</TableCell>
-            <TableCell align="right">Date</TableCell>
-            <TableCell align="right">Amount</TableCell>
+            <TableCell>Plan</TableCell>
+            <TableCell>Date</TableCell>
+            <TableCell>Amount</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -40,9 +40,9 @@ export default function BasicTable() {
               <TableCell component="th" scope="row">
                 {row.name}
               </TableCell>
-              <TableCell align="right">{row.calories}</TableCell>
-              <TableCell align="right">{row.fat}</TableCell>
-              <TableCell align="right">{row.carbs}</TableCell>
+              <TableCell >{row.calories}</TableCell>
+              <TableCell >{row.fat}</TableCell>
+              <TableCell >{row.carbs}</TableCell>
             </TableRow>
           ))}
         </TableBody>
