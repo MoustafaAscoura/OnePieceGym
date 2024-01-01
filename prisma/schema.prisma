@@ -1,0 +1,84 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+  
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+  
+model Trainee {
+  id        Int     @id @default(autoincrement()) 
+  fname     String
+  mname     String?
+  lname     String
+  img       String?
+  email     String?   @unique
+  phone     String?   @unique @db.VarChar(15)
+  active    Boolean @default (true)
+  coach     Coach ? @relation(fields: [coachID], references: [id])
+  coachID   Int ?
+  sessions  Session[]
+  payments  Payment[]
+  program   Program @relation(fields: [programID], references: [id])
+  programID Int
+  createdAt DateTime  @default(now())
+  subscription_start DateTime @default(now())
+  birthdate DateTime
+}
+
+model Coach {
+  id        Int       @id @default(autoincrement()) 
+  fname     String
+  mname     String?
+  lname     String
+  img       String?
+  email     String?   @unique
+  phone     String?   @unique
+  birthdate DateTime
+  admin     Boolean @default (false)
+  trainees  Trainee[]
+  sessions  Session[]
+}
+
+model Session {
+  id        Int       @id @default(autoincrement()) 
+  createdAt DateTime  @default(now())
+  duration Float
+  coach     Coach ? @relation(fields: [coachID], references: [id])
+  coachID   Int ?
+  trainee     Trainee ? @relation(fields: [traineeID], references: [id])
+  traineeID   Int ?
+  Description String ?
+}
+
+model Program {
+  id        Int       @id @default(autoincrement()) 
+  name      String
+  cost      Int
+  period    String
+  duration  Int
+  description  String
+  trainees  Trainee[]
+}
+
+model Message {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String?
+  phone     String?
+  message   String?
+  read      Boolean @default(false)
+  createdAt   DateTime  @default(now())
+}
+
+model Payment {
+  id          Int       @id @default(autoincrement())
+  trainee     Trainee @relation(fields: [traineeID], references: [id])
+  traineeID   Int
+  amount      Int
+  createdAt   DateTime  @default(now())
+}

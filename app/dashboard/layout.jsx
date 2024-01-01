@@ -19,7 +19,8 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
+
+import MailIcon from '@mui/icons-material/Mail';
 import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
 import BuildIcon from "@mui/icons-material/Build";
@@ -28,9 +29,11 @@ import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 import SportsIcon from "@mui/icons-material/Sports";
 import TimerIcon from "@mui/icons-material/Timer";
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import Link from "next/link";
 
 const drawerWidth = 240;
+export const revalidate = 1800 // revalidate cached data at most every 30 mins
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -107,12 +110,13 @@ export default function Layout({ children }) {
     "Modify Website": <BuildIcon />,
     "Settings": <SettingsIcon />,
     "Logout": <LogoutIcon />,
-    "Inbox": <InboxIcon />,
+    "Inbox": <MailIcon />,
     "Trainees": <DirectionsRunIcon />,
     "Coaches": <SportsIcon />,
     "Sessions": <TimerIcon />,
     "Payments": <PaymentsIcon />,
-    "Dashboard": <DashboardIcon />
+    "Dashboard": <DashboardIcon />,
+    "Programs": <InsertDriveFileIcon/>
   };
 
   const handleDrawerOpen = () => {
@@ -140,7 +144,7 @@ export default function Layout({ children }) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" bac>
+          <Typography variant="h6" noWrap component="div" bac="true">
             <Link href='/dashboard'>Admin Dashboard</Link>
           </Typography>
         </Toolbar>
@@ -157,7 +161,7 @@ export default function Layout({ children }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {["Dashboard", "Inbox", "Trainees", "Payments" , "Sessions", "Coaches"].map(
+          {["Dashboard", "Inbox", "Trainees", "Payments" , "Sessions", "Coaches", "Programs"].map(
             (text, index) => {
               let href = `/dashboard${text==="Dashboard"?"":'/'+text.toLowerCase()}`
 

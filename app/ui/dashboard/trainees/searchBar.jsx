@@ -1,9 +1,8 @@
-'use client'
-
 import Link from 'next/link';
 import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
-import { Button, InputBase, Toolbar, Box, AppBar, IconButton } from '@mui/material';
+import { Button, InputBase, Toolbar, Box, AppBar } from '@mui/material';
+
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -47,7 +46,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function SearchBar() {
+export default function SearchBar({query, setQuery}) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" >
@@ -61,6 +60,8 @@ export default function SearchBar() {
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
+              value={query}
+              onChange={e=>setQuery(e.target.value)}
             />
           </Search>
         </Toolbar>

@@ -1,12 +1,32 @@
-import {User} from './models'
+import prisma from './prisma'
 
-export const fetchTrainees = async () => {
+const fetchTrainees = async (query="", results=10, page=1) => {
     try {
-        const users = await User.find();
-        return users;
-    } catch (err) {
-        console.log(err);
-        throw new Error("Failed to fetch Trainees data")
-
+        const res = await prisma.trainee.findMany({
+            orderBy: {id: 'asc'},
+            include: {
+                sessions: {
+                    select:{
+                        duration: true,
+                        createdAt: true
+                    },
+                    orderBy: {id: 'desc'}
+                },
+                payments: {
+                    select:{
+                        amount: true,
+                        createdAt: true
+                    }
+                },
+                program: true,
+                coach: true
+            },
+        })
+        return res;
+    } catch (error) {
+        console.log(error)
+        return error
     }
 }
+
+export {fetchTrainees}
