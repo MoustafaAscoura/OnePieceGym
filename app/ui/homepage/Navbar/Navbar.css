@@ -1,0 +1,17 @@
+.nav-link::before {
+  transition: 300ms;
+  position: absolute;
+  bottom: 5px;
+  width: 40px;
+  height: 4px;
+  background-color: green;
+  content: "";
+  z-index: 1;
+  border-radius: 20px;
+  width: 0%;
+}
+
+.nav-link:hover::before,
+.nav-link.active::before {
+  width: 40px;
+}
