@@ -46,12 +46,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function SearchBar({query, setQuery}) {
+export default function SearchBar({query, setQuery, createNew}) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" >
         <Toolbar className='justify-between bg-green-300 text-black'>
-          <Button component={Link} href='/dashboard/trainees/new' variant="outlined" color="success">Add New</Button>
+          {createNew?<Button onClick={e => createNew()} variant="outlined" color="success">Add New</Button>:<></>}
 
           <Search>
             <SearchIconWrapper>

@@ -161,7 +161,7 @@ export default function Layout({ children }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {["Dashboard", "Inbox", "Trainees", "Payments" , "Sessions", "Coaches", "Programs"].map(
+          {["Dashboard", "Trainees", "Payments", "Sessions", "Coaches", "Programs", "Inbox"].map(
             (text, index) => {
               let href = `/dashboard${text==="Dashboard"?"":'/'+text.toLowerCase()}`
 

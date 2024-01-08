@@ -24,8 +24,6 @@ import TimerIcon from "@mui/icons-material/Timer";
 import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import PaymentDialog from "@/app/ui/dashboard/trainees/paymentDialog";
-import SessionDialog from "@/app/ui/dashboard/trainees/sessionDialog";
 
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -38,29 +36,27 @@ const Img = styled("img")({
   maxHeight: "100%",
 });
 
-export default function TraineeDetails({
-  detailTrainee,
-  setDetailTrainee,
-  serialize_trainee,
-  traineesData,
-  setTraineesData
+export default function CoachDetails({
+  detailCoach,
+  setDetailCoach,
+  serialize_coach,
+  coachesData,
+  setCoachesData
 }) {
   const descriptionElementRef = useRef(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [paymentOpen, setPaymentOpen] = useState(false)
-  const [sessionOpen, setSessionOpen] = useState(false)
   const [mode, setMode] = useState("show"); //show, edit, or create
 
   useEffect(()=>{
-    if (Object.keys(detailTrainee).length === 0) {
+    if (Object.keys(detailCoach).length === 0) {
       setMode("create")
     } else {
       setMode("show")
     }
-  },[detailTrainee])
+  },[detailCoach])
 
   const handleChange = (event) => {
     let val = event.target.value;
@@ -108,13 +104,7 @@ export default function TraineeDetails({
       setLoading(true);
       const formData = new FormData(event.target.form);
       if (mode === "edit") {
-        formData.set("id", detailTrainee.id);
-        if (formData.get("programID") != detailTrainee.programID) {
-          const today = new Date();
-          formData.set("subscription_start", today.toISOString());
-        } else {
-          formData.set("subscription_start", detailTrainee.subscription_start);
-        }
+        formData.set("id", detailCoach.id);
       }
       handleSubmit(formData);
     }
@@ -122,7 +112,7 @@ export default function TraineeDetails({
 
   async function handleSubmit(formData) {
 
-    fetch("/api/trainees", {
+    fetch("/api/coaches", {
       method: "POST",
       body: formData,
     })
@@ -130,9 +120,9 @@ export default function TraineeDetails({
         return response.json();
       })
       .then((jsonResponse) => {
-        const serialized_trainee = serialize_trainee({ ...detailTrainee, ...jsonResponse })
-        setDetailTrainee( serialized_trainee );
-        if (!formData.get('id')){setTraineesData([...traineesData,serialized_trainee])}
+        const serialized_coach = serialize_coach({ ...detailCoach, ...jsonResponse })
+        setDetailCoach( serialized_coach );
+        if (!formData.get('id')){setCoachesData([...coachesData,serialized_coach])}
         setMode("show");
       })
       .catch((err) => {
@@ -147,14 +137,14 @@ export default function TraineeDetails({
 
   const deleteUser = () => {
     setLoading(true);
-    fetch("/api/trainees", {
+    fetch("/api/coaches", {
       method: "DELETE",
-      body: JSON.stringify({ id: detailTrainee.id }),
+      body: JSON.stringify({ id: detailCoach.id }),
     })
       .then((response) => {
         setOpenDelete(false);
-        setTraineesData(traineesData.filter(trainee => trainee.id != detailTrainee.id))
-        setDetailTrainee(false);
+        setCoachesData(coachesData.filter(coach => coach.id != detailCoach.id))
+        setDetailCoach(false);
       })
       .catch((err) => {
         setError("Error Happened! Try Again");
@@ -163,59 +153,19 @@ export default function TraineeDetails({
   };
 
   useEffect(() => {
-    if (detailTrainee) {
+    if (detailCoach) {
       const { current: descriptionElement } = descriptionElementRef;
       if (descriptionElement !== null) {
         descriptionElement.focus();
       }
     }
-  }, [detailTrainee]);
+  }, [detailCoach]);
 
-  const addPayment = (formData) => {
-    let createdAt = new Date()
-    formData.set("createdAt", createdAt.toISOString());
-    formData.set("amount", parseInt(formData.get('amount')));
-    formData.set('id', detailTrainee.id)
-
-    if ( detailTrainee.status === "Membership Expired") {
-        formData.set('renew', detailTrainee.status === "Membership Expired")
-    }
-
-    fetch("/api/payments", {
-        method: "POST",
-        body: formData,
-      }).then(response => response.json())
-        .then(jsonResponse => {
-          const d_ = formData.get('renew') ? { ...detailTrainee, ...jsonResponse }
-          : {...detailTrainee, payments: [...detailTrainee.payments, jsonResponse]}
-
-          setDetailTrainee(serialize_trainee(d_))
-          setPaymentOpen(false);
-        })
-        .catch((err) => {setError("Something went wrong!");});
-    }
-  
-  const addSession = (formData) => {
-    let createdAt = new Date(formData.get('createdAt'))
-    formData.set("createdAt", createdAt.toISOString());
-    formData.set('id', detailTrainee.id)
-    formData.set('coachID', detailTrainee.coachID)
-
-    fetch("/api/sessions", {
-        method: "POST",
-        body: formData,
-      }).then(response => response.json())
-        .then(jsonResponse => {
-          setDetailTrainee(serialize_trainee({...detailTrainee, sessions: [...detailTrainee.sessions, jsonResponse]}))
-          setSessionOpen(false);
-        })
-        .catch((err) => {setError("Something went wrong!");});
-    }
 
   return (
     <Dialog
-      open={detailTrainee}
-      onClose={(e) => setDetailTrainee(false)}
+      open={detailCoach}
+      onClose={(e) => setDetailCoach(false)}
       scroll="paper"
       aria-labelledby="scroll-dialog-title"
       aria-describedby="scroll-dialog-description"
@@ -229,7 +179,7 @@ export default function TraineeDetails({
           ref={descriptionElementRef}
           tabIndex={-1}
         >
-          {detailTrainee?
+          {detailCoach?
           <Paper sx={{ p: 2, margin: 'auto', flexGrow: 1, backgroundColor: (theme) =>
                   theme.palette.mode === 'dark' ? '#1A2027' : '#fff',}}>
 
@@ -237,7 +187,7 @@ export default function TraineeDetails({
                 <Grid item xs={12} sm={12} md={4} spacing={2} className='flex flex-col items-center py-5'>
                     <Avatar
                     alt="Remy Sharp"
-                    src={detailTrainee.img||"/assets/images/trainee_annon.jpg"}
+                    src={detailCoach.img||"/assets/images/coach_annon.jpg"}
                     sx={{ width: 160, height: 160, marginBottom:4}}
                     />
 
@@ -247,7 +197,6 @@ export default function TraineeDetails({
                         {loading? <CircularProgress sx={{mr:2}} size={20}/>:<></>}{loading?"Saving...":"Save"}
                     </Button>
                     : <>
-                    <Chip sx={{marginBottom:5}} color={detailTrainee.status == "Valid Membership"?"success":"warning"} size="small" label={detailTrainee.status}/>
 
                     <Stack spacing={1} justifyContent="center"  alignItems="center" direction="row" useFlexGap flexWrap="wrap" className='w-full max-w-80'>
                         <Button variant="outlined" onClick={e => toggleEdit(e)} 
@@ -258,12 +207,6 @@ export default function TraineeDetails({
                             Delete
                         </Button>
                     </Stack>
-                    <Button variant="outlined" onClick={e => setPaymentOpen(true)} component='div' color="success" startIcon={<AttachMoneyIcon />} className='w-full max-w-96 my-6'>
-                        Add Payment
-                    </Button>
-                    <Button variant="outlined" onClick={e => setSessionOpen(true)} component='div' color="success" startIcon={<TimerIcon />} className='w-full max-w-96'>
-                        Add Session
-                    </Button>
                     </>}
                 </Grid>
 
@@ -275,7 +218,7 @@ export default function TraineeDetails({
                                 ID
                             </Typography>
                             <Typography variant="h5" gutterBottom>
-                            {detailTrainee.id}
+                            {detailCoach.id}
                             </Typography>
                         </Grid></>}
                         <Grid item xs={10}  >
@@ -283,26 +226,26 @@ export default function TraineeDetails({
                             Name </Typography>
                             {mode == "show"?<>
                             <Typography variant="h5" gutterBottom>
-                            {detailTrainee.fname + ' ' + (detailTrainee.mname?detailTrainee.mname + " ":"") + detailTrainee.lname}
+                            {detailCoach.name}
                             </Typography></>:
                             <div className='inline-flex'>
                                 <TextField required error={formErrors.fname} name="fname" label="First Name" 
-                                    defaultValue={detailTrainee?.fname} variant="standard" helperText={formErrors.fname || ""}/>
+                                    defaultValue={detailCoach?.fname} variant="standard" helperText={formErrors.fname || ""}/>
                                 <TextField  error={formErrors.mname} name="mname" label="Middle Name" className='mx-3'
-                                    defaultValue={detailTrainee?.mname} variant="standard" helperText={formErrors.mname || ""}/>
+                                    defaultValue={detailCoach?.mname} variant="standard" helperText={formErrors.mname || ""}/>
                                 <TextField required error={formErrors.lname} name="lname" label="Last Name"
-                                    defaultValue={detailTrainee?.lname} variant="standard" helperText={formErrors.lname || ""}/>
+                                    defaultValue={detailCoach?.lname} variant="standard" helperText={formErrors.lname || ""}/>
                             </div>}
                         </Grid>
                     </Grid>
                     <Grid item>
                         <Divider/>
-                        {mode==="show"? detailTrainee.email?<>
+                        {mode==="show"? detailCoach.email?<>
                         <Typography gutterBottom variant="subtitle1" color="text.secondary">
                             Email    
                         </Typography>
                         <Typography variant="h5" gutterBottom>
-                            {detailTrainee.email}
+                            {detailCoach.email}
                         </Typography>
                         <Divider/>
                         </>:<></>:<>
@@ -310,14 +253,14 @@ export default function TraineeDetails({
                             Email    
                         </Typography>
                         <TextField sx={{mb:2, mt:0}} error={formErrors.email} name="email" fullWidth
-                        defaultValue={detailTrainee.email} variant="standard" margin="normal" helperText={formErrors.email || ""}/><Divider/></>}
+                        defaultValue={detailCoach.email} variant="standard" margin="normal" helperText={formErrors.email || ""}/><Divider/></>}
 
-                        {mode==="show"? detailTrainee.phone?<>
+                        {mode==="show"? detailCoach.phone?<>
                         <Typography gutterBottom variant="subtitle1" color="text.secondary">
                             Phone    
                         </Typography>
                         <Typography variant="h5" gutterBottom>
-                            {detailTrainee.phone}
+                            {detailCoach.phone}
                         </Typography>
                         <Divider/>
                         </>:<></>:<>
@@ -325,83 +268,34 @@ export default function TraineeDetails({
                             Phone    
                         </Typography>
                         <TextField error={formErrors.phone} sx={{mb:2, mt:0}} name="phone" fullWidth required
-                        defaultValue={detailTrainee.phone} variant="standard" margin="normal" helperText={formErrors.phone || ""}/><Divider/></>}
-
-                        {mode==="show"? detailTrainee.coachID?<>
-                        <Typography gutterBottom variant="subtitle1" color="text.secondary">
-                            Coach Name
-                        </Typography>
-                        <Typography variant="h5" gutterBottom>
-                            {detailTrainee.coach.fname + " " + detailTrainee.coach.lname}
-                        </Typography>
-                        <Divider/>
-                        </>:<></>:<>
-                        <Typography gutterBottom variant="subtitle1" color="text.secondary">
-                            Coach ID
-                        </Typography>
-                        <TextField name="coachID" fullWidth sx={{mb:2, mt:0}} required
-                        type="number" defaultValue={detailTrainee.coachID} variant="standard" margin="normal"/><Divider/></>}
-
-                    </Grid>
-                    {mode=="show"?<><Grid item container direction="row" >
-                        <div className='me-20'>
-                            <Typography gutterBottom variant="subtitle1" color="text.secondary">
-                                Program
-                            </Typography>
-                            <Typography variant="h5" gutterBottom>
-                            {detailTrainee.program?.name}
-                            </Typography>
-                        </div>
-                        <div>
-                            <Typography gutterBottom variant="subtitle1" color="text.secondary">
-                            Expiry Date
-                            </Typography>
-                            <Typography variant="h5" gutterBottom>
-                            {detailTrainee.membership_expiry}
-                            </Typography>
-                        </div>
-                    </Grid><Divider/></>:
-                    <Grid item container direction="column" >
-                        <Typography gutterBottom variant="subtitle1" color="text.secondary">
-                            Program ID
-                        </Typography>
-                        <TextField name="programID" fullWidth sx={{mb:2, mt:0}} required
-                        type="number" defaultValue={detailTrainee.programID} variant="standard" margin="normal"/>
-                        <Divider/>
+                        defaultValue={detailCoach.phone} variant="standard" margin="normal" helperText={formErrors.phone || ""}/><Divider/>
                         <Typography gutterBottom variant="subtitle1" color="text.secondary">
                             Birthdate
                         </Typography>
-                        <input id="birthdate" name="birthdate" type="date" defaultValue={detailTrainee.birthdate?.toISOString().split('T')[0]} required class="mt-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
+                        <input id="birthdate" name="birthdate" type="date" defaultValue={detailCoach.birthdate?.toISOString().split('T')[0]} required class="mt-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
                         <Divider/>
-                        </Grid>}
+                        </>}
+
+                    </Grid>
 
                     {mode === "create"?<></>:<>
-                      <Grid item container direction="row" sx={{pl:0}} >
-                          <div className='me-20'>
-                              <Typography gutterBottom variant="subtitle1" color="text.secondary">
-                                  Member Since    
-                              </Typography>
-                              <Typography variant="h5" gutterBottom>
-                                  {detailTrainee.createdAt?.toLocaleDateString('en-GB')}
-                              </Typography>
-                          </div>
+                      <Grid item container direction="column" sx={{pl:0}} >
                           <div>
                               <Typography gutterBottom variant="subtitle1" color="text.secondary">
                                   Sessions    
                               </Typography>
                               <Typography variant="h5" gutterBottom>
-                                  {detailTrainee.sessions_count}
+                                  {detailCoach.sessions_count}
                               </Typography>
                           </div>
-                      </Grid>
-                      <Divider/>
-                      <Grid item>
-                          <Typography gutterBottom variant="subtitle1" color="text.secondary">
-                              Due Payment    
-                          </Typography>
-                          <Typography variant="h5" gutterBottom>
-                              Paid {detailTrainee.payment_total} out of {detailTrainee.program?.cost}
-                          </Typography>
+                          <div>
+                              <Typography gutterBottom variant="subtitle1" color="text.secondary">
+                                  Trainees    
+                              </Typography>
+                              <Typography variant="h5" gutterBottom>
+                                  {detailCoach.trainees_count}
+                              </Typography>
+                          </div>
                       </Grid>
                     </>}
                   </Grid>
@@ -429,8 +323,6 @@ export default function TraineeDetails({
                   </Button>
                   </DialogActions>
                 </Dialog>
-                <PaymentDialog open={paymentOpen} setOpen={setPaymentOpen} addPayment={addPayment}/>
-                <SessionDialog open={sessionOpen} setOpen={setSessionOpen} addSession={addSession}/>
               </>}
 
               <Snackbar open={error} autoHideDuration={6000} onClose={e=>setError(false)}>
@@ -445,7 +337,7 @@ export default function TraineeDetails({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button color="success" onClick={(e) => setDetailTrainee(false)}>
+        <Button color="success" onClick={(e) => setDetailCoach(false)}>
           Close
         </Button>
       </DialogActions>

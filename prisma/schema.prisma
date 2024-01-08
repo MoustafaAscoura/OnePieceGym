@@ -39,20 +39,22 @@ model Coach {
   email     String?   @unique
   phone     String?   @unique
   birthdate DateTime
-  admin     Boolean @default (false)
+  bio       String?
+  admin     Boolean? @default(false)
   trainees  Trainee[]
   sessions  Session[]
 }
 
 model Session {
-  id        Int       @id @default(autoincrement()) 
-  createdAt DateTime  @default(now())
-  duration Float
-  coach     Coach ? @relation(fields: [coachID], references: [id])
-  coachID   Int ?
+  id          Int       @id @default(autoincrement()) 
+  createdAt   DateTime  @default(now())
+  duration    Float?
+  coach       Coach ? @relation(fields: [coachID], references: [id])
+  coachID     Int ?
   trainee     Trainee ? @relation(fields: [traineeID], references: [id])
   traineeID   Int ?
-  Description String ?
+  description String ?
+  rating      Float?  @default(5)
 }
 
 model Program {
@@ -77,8 +79,8 @@ model Message {
 
 model Payment {
   id          Int       @id @default(autoincrement())
-  trainee     Trainee @relation(fields: [traineeID], references: [id])
-  traineeID   Int
+  trainee     Trainee? @relation(fields: [traineeID], references: [id])
+  traineeID   Int?
   amount      Int
   createdAt   DateTime  @default(now())
 }
