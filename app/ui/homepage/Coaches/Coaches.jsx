@@ -1,20 +1,21 @@
 export default function Coaches () {
-    return <section id="coaches" className="text-center py-2 py-lg-5">
-        <div className='container'>
-            <h3 className='section-header my-3'><span className='border border-success line'></span>Meet Us</h3>
-            <h1 className='fw-bold'>OUR <span className='text-success'>Coaches</span></h1>
-            <div className="d-flex justify-content-between mt-5 mt-lg-5 slider">
-                <div>
-                    <img src='/assets/images/Ayman.jpg' alt="Martial Arts" />
-                    <h4 className='text-light w-100 caption'>Cap. Ayman</h4>
+    return <section id="coaches" className="bg-gray-900 text-center py-2 lg:py-5 ">
+        <div className='w-full max-w-7xl mx-auto my-16 px-8'>
+            <h3 className='section-header flex justify-center items-center text-2xl my-5'><span className='border-2 border-green-600 me-4 w-24'></span>Meet Us</h3>
+            <h1 className='font-bold text-2xl lg:text-5xl'>OUR <span className='text-green-600'>TEAM</span></h1>
+            
+            <div className="w-full flex flex-row overflow-x-scroll slider mt-8">
+                <div className='flex-shrink-0'>
+                    <img src='/assets/images/Ayman.jpg' alt="Ayman" />
+                    <h4 className='w-full caption'>Cap. Ayman</h4>
                 </div>
-                <div className='mx-5'>
-                    <img src='/assets/images/Badr.jpg' alt="" />
-                    <h4 className='text-light w-100 caption'>Cap. Badr</h4>
+                <div className='flex-shrink-0 mx-5'>
+                    <img src='/assets/images/Badr.jpg' alt="Badr" />
+                    <h4 className='w-full caption'>Cap. Badr</h4>
                 </div>
-                <div>
-                    <img src='/assets/images/Mostafa.jpg' alt="" />
-                    <h4 className='text-light w-100 caption'>Cap. Mostafa</h4>
+                <div className='flex-shrink-0'>
+                    <img src='/assets/images/Mostafa.jpg' alt="Mostafa" />
+                    <h4 className='w-full caption'>Cap. Mostafa</h4>
                 </div>
             </div>
         </div>
