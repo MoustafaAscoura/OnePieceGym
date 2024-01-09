@@ -1,28 +1,27 @@
-section div.d-flex.slider {
-    overflow: auto;
-    -ms-overflow-style: none;  
-    scrollbar-width: none;
-}
-  
-section div.d-flex.slider::-webkit-scrollbar{
-    display: none;
+section div.flex.slider {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-section div.d-flex.slider > div {
+section div.flex.slider::-webkit-scrollbar {
+  display: none;
+}
+
+section div.flex.slider > div {
     position: relative;
-}
+  }
 
-section div.d-flex.slider > div h4.caption{
+section div.flex.slider > div h4.caption {
     position: absolute;
     z-index: 100;
     bottom: 10px;
     font-weight: 800;
     font-size: 2.5rem;
-}
+  }
 
 section .slider img {
-    height: 60vh;
-    max-height: 600px;
-    width: min(80vw, 400px);
-    object-fit: cover;
-}
+  height: 60vh;
+  max-height: 600px;
+  width: min(80vw, 400px);
+  object-fit: cover;
+} 

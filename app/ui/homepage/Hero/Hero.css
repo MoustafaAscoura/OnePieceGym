@@ -1,24 +1,7 @@
 .hero {
-    display: grid;
-    place-items: center start;
-    padding-left: 10vw;
-    padding-right: 5vw;
     background: linear-gradient(rgba(2, 74, 1, 0.1), rgba(0, 0, 0, 0.9)),
     url('/assets/images/Hero.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-}
-
-.hero h1 {
-    color: white;
-    font-size: 10vmin;
-    font-weight: 600;
-}
-
-.hero p {
-    font-weight: 200;
-    font-size: min(5vmin,24px);
-    max-width: 1000px;
-    line-height: 5vmin;
 }

@@ -11,6 +11,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    scroll-behavior: smooth;
 }
 
 a {
@@ -30,5 +31,5 @@ body {
 }
 
 body > section:not(#contact) {
-  height: 100vh;
+  min-height: 100vh;
 }
