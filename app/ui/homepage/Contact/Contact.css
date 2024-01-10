@@ -4,7 +4,6 @@ section#contact img {
     height: fit-content;
     object-fit: contain;
     box-shadow: -30px -30px 0 0 rgb(var(--bs-success-rgb));
-    margin-left: 60px;
 }
 
 @media screen and (max-width: 600px) {

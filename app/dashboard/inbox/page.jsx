@@ -9,7 +9,6 @@ import SearchBar from "@/app/ui/dashboard/trainees/searchBar"
 const columns = [
   { id: 'id', label: 'ID', minWidth: 60},
   { id: 'name', label: 'Name', minWidth: 150},
-  { id: 'email', label: 'Email', minWidth: 100},
   { id: 'phone', label: 'Phone', minWidth: 100},
   {
     id: 'message', 
