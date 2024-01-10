@@ -30,6 +30,6 @@ body {
   font-family: 'Heebo', sans-serif;
 }
 
-body > section:not(#contact) {
+body > section, body > footer {
   min-height: 100vh;
 }

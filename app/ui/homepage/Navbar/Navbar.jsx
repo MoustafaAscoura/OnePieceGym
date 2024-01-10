@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import "./Navbar.css";
 import {
   AppBar,
@@ -26,6 +26,8 @@ const pages = ["Home", "Services", "Programs", "Coaches", "Plans", "Contact"];
 const settings = ["Add Session", "Logout"];
 const admin_settings = ["Dashboard", "Logout"];
 
+import $ from 'jquery';
+
 function Logo() {
   return (
     <>
@@ -46,7 +48,15 @@ export default function Navbar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [logged, setLogged] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const [currSection, setCurrSection] = useState(0)
 
+  useEffect(()=>{
+      $(document).on('scroll', function() {
+          let s = Math.floor($(document).scrollTop() / $(window).height())
+          setCurrSection(s);
+      });
+  },[])
+  
   const trigger = useScrollTrigger({
     // Number of pixels needed to scroll to toggle `trigger` to `true`.
     threshold: 300,
@@ -170,11 +180,11 @@ export default function Navbar() {
             justifyContent="end"
             gap={2}
           >
-            {pages.map((page) => (
+            {pages.map((page, index) => (
               <Button
                 key={page}
                 sx={{color: "white", display: "block", fontSize:"20px", fontWeight:"400", textTransform:"none"}}
-                className="nav-link"
+                className={`nav-link ${currSection == index ? 'active':''}`}
                 href={`#${page.toLowerCase()}`}
               >
                 {page}
