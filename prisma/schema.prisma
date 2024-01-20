@@ -17,7 +17,7 @@ model Trainee {
   lname     String
   img       String?
   email     String?   @unique
-  phone     String?   @unique @db.VarChar(15)
+  phone     String   @unique @db.VarChar(15)
   active    Boolean @default (true)
   coach     Coach ? @relation(fields: [coachID], references: [id])
   coachID   Int ?
@@ -37,7 +37,7 @@ model Coach {
   lname     String
   img       String?
   email     String?   @unique
-  phone     String?   @unique
+  phone     String   @unique @db.VarChar(15)
   birthdate DateTime
   bio       String?
   admin     Boolean? @default(false)

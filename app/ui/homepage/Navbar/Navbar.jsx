@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { getCookie, setCookie } from 'cookies-next';
 import "./Navbar.css";
 import {
   AppBar,
@@ -27,6 +28,7 @@ const settings = ["Add Session", "Logout"];
 const admin_settings = ["Dashboard", "Logout"];
 
 import $ from 'jquery';
+import AuthForm from "../../authentication/AuthForm";
 
 function Logo() {
   return (
@@ -46,15 +48,27 @@ function Logo() {
 
 export default function Navbar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
-  const [logged, setLogged] = useState(false);
+  const [user, setUser] = useState(false)
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [currSection, setCurrSection] = useState(0)
+  const [openLoginForm, setOpenLoginForm] = useState(false)
+
+  const logout = (e) => {
+    console.log("Logging Out")
+    setUser(false)
+    setCookie('user',undefined)
+  }
 
   useEffect(()=>{
       $(document).on('scroll', function() {
           let s = Math.floor($(document).scrollTop() / $(window).height())
           setCurrSection(s);
       });
+
+      const _user = getCookie('user');
+      if (_user != undefined){
+          setUser(_user)
+      }
   },[])
   
   const trigger = useScrollTrigger({
@@ -95,14 +109,14 @@ export default function Navbar() {
   };
 
   return (
-    <AppBar position="fixed" color="transparent" className="border-b-2 border-white">
+    <AppBar position="fixed" className="border-b-2 border-white bg-slate-950">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
             variant="h4"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="#home"
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
@@ -162,7 +176,7 @@ export default function Navbar() {
             variant="h5"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="#home"
             sx={{
               mr: 2,
               display: { xs: "flex", md: "none" },
@@ -175,6 +189,7 @@ export default function Navbar() {
           >
             <Logo />
           </Typography>
+
           <Box
             sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}
             justifyContent="end"
@@ -192,11 +207,11 @@ export default function Navbar() {
             ))}
           </Box>
 
-          {logged ? (
-            <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
+          {user ? (
+            <Box sx={{ flexGrow: 0, marginLeft: 5 }}>
+              <Tooltip title={user.name}>
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                  <Avatar alt={user.name} src="/assets/images/trainee_annon.jpg" />
                 </IconButton>
               </Tooltip>
               <Menu
@@ -215,15 +230,24 @@ export default function Navbar() {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center">{setting}</Typography>
+                  {user.coach?
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">Dashboard</Typography>
+                  </MenuItem>:
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">Add Session</Typography>
+                  </MenuItem>}
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center" onClick={logout}>Logout</Typography>
                   </MenuItem>
-                ))}
               </Menu>
             </Box>
           ) : (
-            <></>
+            <><Button variant="outlined" color="success" className="ms-12" onClick={() => setOpenLoginForm(true)}>
+                  Login
+              </Button>
+              <AuthForm open={openLoginForm} setOpen={setOpenLoginForm} setUser={setUser}/>
+          </>
           )}
         </Toolbar>
       </Container>

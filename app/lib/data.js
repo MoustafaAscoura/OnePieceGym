@@ -304,7 +304,29 @@ const addSession = async (data) => {
     return newSession
 }
 
+const getTrainee = async (id) => {
+    const trainee = await prisma.trainee.findUnique({
+        where: {
+          id:parseInt(id),
+        },
+      })
+    
+      return trainee
+}
+
+const getCoach = async (id) => {
+    const coach = await prisma.coach.findUnique({
+        where: {
+          id:parseInt(id),
+        },
+    })
+    
+    return coach
+}
+
+
 export {fetchTrainees, editTrainee, createTrainee, deleteTrainee, 
     addPayment, addSession, fetchPayments, fetchSessions, 
     fetchMessages, seeMessage, createMessage,
-    fetchCoaches, editCoach, deleteCoach, createCoach}
+    fetchCoaches, editCoach, deleteCoach, createCoach,
+    getCoach, getTrainee}

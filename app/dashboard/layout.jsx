@@ -119,99 +119,100 @@ export default function Layout({ children }) {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <AppBar position="fixed" open={open} sx={{ bgcolor: "var(--primary)" }}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              marginRight: 5,
-              ...(open && { display: "none" }),
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div" bac="true">
-            <Link href='/dashboard'>Admin Dashboard</Link>
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer variant="permanent" open={open}>
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "rtl" ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {["Dashboard", "Trainees", "Payments", "Sessions", "Coaches", "Programs", "Inbox"].map(
-            (text, index) => {
-              let href = `/dashboard${text==="Dashboard"?"":'/'+text.toLowerCase()}`
 
-              return <ListItem key={text} component={Link} disablePadding sx={{ display: "block" }}
-              href={href} 
-              className={href === pathname? 'bg-green-100':''}
-              >
-                <ListItemButton 
-                  sx={{
-                    minHeight: 48,
-                    justifyContent: open ? "initial" : "center",
-                    px: 2.5,
-                  }}
-                > 
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 0,
-                      mr: open ? 3 : "auto",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {icons[text]}
-                  </ListItemIcon>
-                  <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                </ListItemButton>
-              </ListItem>
-            }
-          )}
-        </List>
-        <Divider />
-        <List>
-          {["Modify Website", "Settings", "Logout"].map((text, index) => (
-            <ListItem key={index} disablePadding sx={{ display: "block" }}>
-              <ListItemButton onClick={()=>router.push(`/dashboard/${text.toLowerCase()}`)}
+      <Box sx={{display: "flex"}}>
+        <CssBaseline/>
+        <AppBar position="fixed" open={open} className='bg-green-400'>
+          <Toolbar>
+            <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="start"
                 sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
+                  marginRight: 5,
+                  ...(open && {display: "none"}),
                 }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                  }}
-                >
-                  {icons[text]}
-                </ListItemIcon>
-                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 5 }}>
-        <DrawerHeader />
-        {children}
+            >
+              <MenuIcon/>
+            </IconButton>
+            <Typography variant="h6" noWrap component="div" bac="true">
+              <Link href='/dashboard'>Admin Dashboard</Link>
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Drawer variant="permanent" open={open}>
+          <DrawerHeader>
+            <IconButton onClick={handleDrawerClose}>
+              {theme.direction === "rtl" ? (
+                  <ChevronRightIcon/>
+              ) : (
+                  <ChevronLeftIcon/>
+              )}
+            </IconButton>
+          </DrawerHeader>
+          <Divider/>
+          <List>
+            {["Dashboard", "Trainees", "Payments", "Sessions", "Coaches", "Programs", "Inbox"].map(
+                (text, index) => {
+                  let href = `/dashboard${text === "Dashboard" ? "" : '/' + text.toLowerCase()}`
+
+                  return <ListItem key={text} component={Link} disablePadding sx={{display: "block"}}
+                                   href={href}
+                                   className={href === pathname ? 'bg-green-100' : ''}
+                  >
+                    <ListItemButton
+                        sx={{
+                          minHeight: 48,
+                          justifyContent: open ? "initial" : "center",
+                          px: 2.5,
+                        }}
+                    >
+                      <ListItemIcon
+                          sx={{
+                            minWidth: 0,
+                            mr: open ? 3 : "auto",
+                            justifyContent: "center",
+                          }}
+                      >
+                        {icons[text]}
+                      </ListItemIcon>
+                      <ListItemText primary={text} sx={{opacity: open ? 1 : 0}}/>
+                    </ListItemButton>
+                  </ListItem>
+                }
+            )}
+          </List>
+          <Divider/>
+          <List>
+            {["Modify Website", "Settings", "Logout"].map((text, index) => (
+                <ListItem key={index} disablePadding sx={{display: "block"}}>
+                  <ListItemButton onClick={() => router.push(`/dashboard/${text.toLowerCase()}`)}
+                                  sx={{
+                                    minHeight: 48,
+                                    justifyContent: open ? "initial" : "center",
+                                    px: 2.5,
+                                  }}
+                  >
+                    <ListItemIcon
+                        sx={{
+                          minWidth: 0,
+                          mr: open ? 3 : "auto",
+                          justifyContent: "center",
+                        }}
+                    >
+                      {icons[text]}
+                    </ListItemIcon>
+                    <ListItemText primary={text} sx={{opacity: open ? 1 : 0}}/>
+                  </ListItemButton>
+                </ListItem>
+            ))}
+          </List>
+        </Drawer>
+        <Box component="main" sx={{flexGrow: 1, p: 5}} className='bg-white-0'>
+          <DrawerHeader/>
+          {children}
+        </Box>
       </Box>
-    </Box>
   );
 }
