@@ -27,7 +27,9 @@ export default function RootLayout({ children }) {
         <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;700;900&display=swap" rel="stylesheet"/>
         <title>One Piece Gym</title>
       </Head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+        </body>
     </html>
   )
 }

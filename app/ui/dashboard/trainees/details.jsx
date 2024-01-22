@@ -15,6 +15,7 @@ import {
   Button,
   TextField,
   Divider,
+  Snackbar
 } from "@mui/material";
 
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -22,28 +23,22 @@ import EditIcon from "@mui/icons-material/Edit";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import TimerIcon from "@mui/icons-material/Timer";
 import CircularProgress from "@mui/material/CircularProgress";
-import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import PaymentDialog from "@/app/ui/dashboard/trainees/paymentDialog";
 import SessionDialog from "@/app/ui/dashboard/trainees/sessionDialog";
+import { useDispatch } from "react-redux";
+import { removeFromTraineesList, editTrainee, addToTraineesList } from "@/app/lib/store/slices/traineesSlice";
+import {serialize_trainee} from "@/app/lib/utils/functions";
+import { addToPaymentsList } from "@/app/lib/store/slices/paymentsSlice";
+import { addToSessionsList } from "@/app/lib/store/slices/sessionsSlice";
 
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const Img = styled("img")({
-  margin: "auto",
-  display: "block",
-  maxWidth: "100%",
-  maxHeight: "100%",
-});
-
 export default function TraineeDetails({
   detailTrainee,
   setDetailTrainee,
-  serialize_trainee,
-  traineesData,
-  setTraineesData
 }) {
   const descriptionElementRef = useRef(null);
   const [openDelete, setOpenDelete] = useState(false);
@@ -53,6 +48,7 @@ export default function TraineeDetails({
   const [paymentOpen, setPaymentOpen] = useState(false)
   const [sessionOpen, setSessionOpen] = useState(false)
   const [mode, setMode] = useState("show"); //show, edit, or create
+  const dispatch = useDispatch()
 
   useEffect(()=>{
     if (Object.keys(detailTrainee).length === 0) {
@@ -132,7 +128,11 @@ export default function TraineeDetails({
       .then((jsonResponse) => {
         const serialized_trainee = serialize_trainee({ ...detailTrainee, ...jsonResponse })
         setDetailTrainee( serialized_trainee );
-        if (!formData.get('id')){setTraineesData([...traineesData,serialized_trainee])}
+        if (!formData.get('id')){
+          dispatch(addToTraineesList(serialized_trainee))
+        } else {
+          dispatch(editTrainee(serialized_trainee))
+        }
         setMode("show");
       })
       .catch((err) => {
@@ -153,7 +153,7 @@ export default function TraineeDetails({
     })
       .then((response) => {
         setOpenDelete(false);
-        setTraineesData(traineesData.filter(trainee => trainee.id != detailTrainee.id))
+        dispatch(removeFromTraineesList(detailTrainee.id))
         setDetailTrainee(false);
       })
       .catch((err) => {
@@ -189,7 +189,10 @@ export default function TraineeDetails({
           const d_ = formData.get('renew') ? { ...detailTrainee, ...jsonResponse }
           : {...detailTrainee, payments: [...detailTrainee.payments, jsonResponse]}
 
-          setDetailTrainee(serialize_trainee(d_))
+          const d_serialized = serialize_trainee(d_)
+          dispatch(editTrainee(d_serialized))
+          dispatch(addToPaymentsList(jsonResponse))
+          setDetailTrainee(d_serialized)
           setPaymentOpen(false);
         })
         .catch((err) => {setError("Something went wrong!");});
@@ -206,7 +209,11 @@ export default function TraineeDetails({
         body: formData,
       }).then(response => response.json())
         .then(jsonResponse => {
-          setDetailTrainee(serialize_trainee({...detailTrainee, sessions: [...detailTrainee.sessions, jsonResponse]}))
+          const d_serialized = serialize_trainee({...detailTrainee, sessions: [...detailTrainee.sessions, jsonResponse]})
+          dispatch(editTrainee(d_serialized))
+          dispatch(addToSessionsList(jsonResponse))
+          setDetailTrainee(d_serialized)
+          setPaymentOpen(false);
           setSessionOpen(false);
         })
         .catch((err) => {setError("Something went wrong!");});

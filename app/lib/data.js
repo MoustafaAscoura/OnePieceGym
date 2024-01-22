@@ -1,6 +1,6 @@
 import prisma from './prisma'
 
-const fetchTrainees = async () => {
+export const fetchTrainees = async () => {
     const res = await prisma.trainee.findMany({
         orderBy: {id: 'asc'},
         include: {
@@ -24,7 +24,7 @@ const fetchTrainees = async () => {
     return res;
 }
 
-const fetchCoaches = async () => {
+export const fetchCoaches = async () => {
     const res = await prisma.coach.findMany({
         orderBy: {id: 'asc'},
         include: {
@@ -47,7 +47,7 @@ const fetchCoaches = async () => {
     return res;
 }
 
-const fetchPayments = async () => {
+export const fetchPayments = async () => {
     try {
         const res = await prisma.payment.findMany({
             orderBy: {id: 'desc'},
@@ -68,7 +68,7 @@ const fetchPayments = async () => {
     }
 }
 
-const fetchSessions = async () => {
+export const fetchSessions = async () => {
     try {
         const res = await prisma.session.findMany({
             orderBy: {id: 'desc'},
@@ -96,7 +96,7 @@ const fetchSessions = async () => {
     }
 }
 
-const fetchMessages = async () => {
+export const fetchMessages = async () => {
     try {
         const res = await prisma.message.findMany({
             orderBy: {id: 'desc'},
@@ -108,7 +108,19 @@ const fetchMessages = async () => {
     }
 }
 
-const seeMessage = async (id) => {   
+export const fetchPrograms = async () => {
+    const res = await prisma.program.findMany({
+        orderBy: {id: 'asc'},
+        include: {
+            _count: {
+                select: {trainees: true}
+            }
+        },
+    })
+    return res;
+}
+
+export const seeMessage = async (id) => {   
     const seenMessage = await prisma.message.update({
         where: {
             id: parseInt(id),
@@ -121,7 +133,7 @@ const seeMessage = async (id) => {
     return seenMessage
 }
 
-const editTrainee = async (data) => {   
+export const editTrainee = async (data) => {   
     const updateTrainee = await prisma.trainee.update({
         where: {
             id: parseInt(data.id),
@@ -150,7 +162,7 @@ const editTrainee = async (data) => {
     return updateTrainee
 }
 
-const editCoach = async (data) => {   
+export const editCoach = async (data) => {   
     const updateCoach = await prisma.coach.update({
         where: {
             id: parseInt(data.id),
@@ -178,7 +190,7 @@ const editCoach = async (data) => {
     return updateCoach
 }
 
-const createTrainee = async (data) => {
+export const createTrainee = async (data) => {
     const newTrainee = await prisma.trainee.create({
         data: data,
         include: {
@@ -203,14 +215,14 @@ const createTrainee = async (data) => {
     return newTrainee
 }
 
-const createMessage = async (data) => {
+export const createMessage = async (data) => {
     const newMessage = await prisma.message.create({
         data: data,
       })
     return newMessage
 }
 
-const createCoach = async (data) => {
+export const createCoach = async (data) => {
     const newCoach = await prisma.coach.create({
         data: data,
         include: {
@@ -234,7 +246,7 @@ const createCoach = async (data) => {
     return newCoach
 }
 
-const deleteTrainee = async (id) => {
+export const deleteTrainee = async (id) => {
     const deletedTrainee = await prisma.trainee.delete({
         where: {
             id: parseInt(id)
@@ -244,7 +256,7 @@ const deleteTrainee = async (id) => {
     return deletedTrainee
 } 
 
-const deleteCoach = async (id) => {
+export const deleteCoach = async (id) => {
     const deletedCoach = await prisma.coach.delete({
         where: {
             id: parseInt(id)
@@ -254,7 +266,7 @@ const deleteCoach = async (id) => {
     return deletedCoach
 } 
 
-const addPayment = async (data) => {
+export const addPayment = async (data) => {
     const newPayment = await prisma.payment.create({
         data: {
             amount: data.amount,
@@ -289,7 +301,7 @@ const addPayment = async (data) => {
     return newPayment
 }
 
-const addSession = async (data) => {
+export const addSession = async (data) => {
     const newSession = await prisma.session.create({
         data: {
             description: data.description,
@@ -304,7 +316,15 @@ const addSession = async (data) => {
     return newSession
 }
 
-const getTrainee = async (id) => {
+export const addProgram = async (data) => {
+    const newProgram = await prisma.program.create({
+        data: data,
+      })
+
+    return newProgram
+}
+
+export const getTrainee = async (id) => {
     const trainee = await prisma.trainee.findUnique({
         where: {
           id:parseInt(id),
@@ -314,7 +334,7 @@ const getTrainee = async (id) => {
       return trainee
 }
 
-const getCoach = async (id) => {
+export const getCoach = async (id) => {
     const coach = await prisma.coach.findUnique({
         where: {
           id:parseInt(id),
@@ -324,9 +344,60 @@ const getCoach = async (id) => {
     return coach
 }
 
+export const countTrainees = async () => {
+    const count = await prisma.trainee.count()
+    return count
+}
 
-export {fetchTrainees, editTrainee, createTrainee, deleteTrainee, 
-    addPayment, addSession, fetchPayments, fetchSessions, 
-    fetchMessages, seeMessage, createMessage,
-    fetchCoaches, editCoach, deleteCoach, createCoach,
-    getCoach, getTrainee}
+export const countCoaches = async () => {
+    const count = await prisma.coach.count()
+    return count
+}
+
+export const countPrograms = async () => {
+    const count = await prisma.program.count()
+    return count
+}
+
+export const latestPayments = async () => {
+    const month_from_today = new Date(new Date() - 2592000000)
+
+    const payments = await prisma.payment.aggregate({
+        _sum: {
+          amount: true,
+        },
+        where: {
+          createdAt: {
+            gte: month_from_today
+          },
+        },
+    })
+      
+    return payments
+}
+
+export const latestSessions = async () => {
+    const month_from_today = new Date(new Date() - 2592000000)
+
+    const sessions = await prisma.session.aggregate({
+        _count: true,
+        where: {
+          createdAt: {
+            gte: month_from_today
+          },
+        },
+    })
+      
+    return sessions
+}
+
+export const unreadMessages = async () => {
+    const messages = await prisma.message.aggregate({
+        _count: true,
+        where: {
+          read: false,
+        },
+    })
+      
+    return messages
+}

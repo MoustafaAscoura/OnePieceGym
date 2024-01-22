@@ -6,50 +6,46 @@ import {Box, Paper, Chip, LinearProgress, Table, TableBody,
 import MuiAlert from '@mui/material/Alert';
 import SearchBar from "@/app/ui/dashboard/trainees/searchBar"
 import TraineeDetails from "@/app/ui/dashboard/trainees/details";
-import {serialize_trainee} from "@/app/lib/utils/functions";
+import { useSelector, useDispatch } from "react-redux";
+import { setErrorStatus, setTraineesList } from "../../lib/store/slices/traineesSlice";
+import { serialize_trainee } from "@/app/lib/utils/functions";
 
+export async function getTrainees () {
+    try {
+      const res = await fetch(`/api/trainees`, { next: { tags: ['trainees'] } })
+      if (res.ok) {
+        return res.json().map(trainee => {
+          return serialize_trainee(trainee)
+      });
+  
+      } else {
+        throw new Error('Something went wrong');
+      }
+  
+    } catch {
+      return false
+    }
+  }
 
 const columns = [
   { id: 'id', label: 'ID', minWidth: 60},
   { id: 'name', label: 'Name', minWidth: 150},
-  {
-    id: 'age', 
-    label: 'Age',
-    minWidth: 60,
-  },
-  {
-    id: 'coach_name',
-    label: 'Assigned Coach',
-    minWidth: 150,
-  },
-  {
-    id: 'payment_due',
-    label: 'Payment Remaining',
-    minWidth: 170,
-  },
-  {
-    id: 'sessions_count',
-    label: 'Sessions',
-    minWidth:100
-  },{
-    id:'membership_expiry',
-    label: 'Membership Expiry',
-    minWidth:100
-  },{
-    id:'status',
-    label: 'Membership Status',
-    minWidth:100
-  }
+  { id: 'age', label: 'Age', minWidth: 60},
+  { id: 'coach_name', label: 'Assigned Coach', minWidth: 150},
+  { id: 'payment_due', label: 'Payment Remaining', minWidth: 170},
+  { id: 'sessions_count', label: 'Sessions', minWidth:100},
+  { id:'membership_expiry', label: 'Membership Expiry', minWidth:100},
+  { id:'status', label: 'Membership Status', minWidth:100}
 ];
 
 export default function Trainees () {
     const [page, setPage] = useState(0);
-    const [status, setStatus] = useState(0);
     const [query, setQuery] = useState("");
     const [detailTrainee, setDetailTrainee] = useState(false)
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [traineesData, setTraineesData] = useState(false);
     const [filteredData, setFilteredData] = useState(false);
+    const {traineesList, status} = useSelector(state => state.traineesList)
+    const dispatch = useDispatch()
 
     const handleChangePage = (event, newPage) => {
       setPage(newPage);
@@ -61,31 +57,27 @@ export default function Trainees () {
     };
 
     useEffect(()=>{
-        if (traineesData) {
-            setFilteredData(traineesData.filter(trainee => {
+        if (traineesList) {
+            setFilteredData(traineesList.filter(trainee => {
                 return (trainee.fname+trainee.mname+trainee.lname).toLowerCase().includes(query.toLowerCase())
             }))
-        } else {
-            fetch(`/api/trainees`, { next: { tags: ['trainees'] } })
-            .then((response)=>{
-                if (response.ok) {
-                    setStatus(1)
-                    return response.json();
-                }
-                setStatus(-1)
-                throw new Error('Something went wrong');
-            })
-            .then((responseJson) => {
-                setTraineesData(responseJson.map(trainee => {
-                    return serialize_trainee(trainee)
-                }))
-            }).catch((e)=>{
-                setStatus(-1)
-                console.log(e)
-            })
-        } 
-
-    },[query, traineesData])
+        }
+    },[query, traineesList])
+  
+    function fetchTrainees () {
+      const trainees = getTrainees()
+      if (trainees) {
+        dispatch(setTraineesList(trainees))
+      } else {
+        dispatch(setErrorStatus())
+      }
+    }
+  
+    useEffect(() => {
+      if (status == 0) {
+        fetchTrainees()
+      }
+    }, [])
 
     return (
         <Box className="bg-green-100">
@@ -130,7 +122,7 @@ export default function Trainees () {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 20, 50]}
                     component="div"
-                    count={traineesData.length}
+                    count={traineesList.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
@@ -139,7 +131,7 @@ export default function Trainees () {
                     showLastButton={true}
                 />
             </Paper>
-            <TraineeDetails detailTrainee={detailTrainee} setDetailTrainee={setDetailTrainee} serialize_trainee={serialize_trainee} traineesData={traineesData} setTraineesData={setTraineesData}/>
+            <TraineeDetails detailTrainee={detailTrainee} setDetailTrainee={setDetailTrainee}/>
         </Box>
     );
 }

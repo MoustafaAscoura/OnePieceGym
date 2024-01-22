@@ -14,9 +14,8 @@ function createData(name, calories, fat, carbs, protein) {
 const rows = [
     createData('Ahmed Yasser', 'Basic', 'Thu, 26-09-2023', 5000),
     createData('Mohamed Galal', 'Advanced', 'Wed, 22-09-2023', 1000),
-    createData('Ahmed Yasser', 'Basic', 'Thu, 26-09-2023', 5000),
-    createData('Mohamed Galal', 'Advanced', 'Wed, 22-09-2023', 1000),
-    createData('Ahmed Yasser', 'Basic', 'Thu, 26-09-2023', 5000),
+    createData('Ahmed Galal', 'Basic', 'Thu, 26-09-2023', 5000),
+    createData('Mohamed Yasser', 'Advanced', 'Wed, 22-09-2023', 1000),
 ];
 
 export default function BasicTable() {

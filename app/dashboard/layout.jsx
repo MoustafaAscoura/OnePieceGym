@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { styled, useTheme } from "@mui/material/styles";
 import MuiDrawer from "@mui/material/Drawer";
@@ -22,6 +22,9 @@ import TimerIcon from "@mui/icons-material/Timer";
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import Link from "next/link";
+import { getCookie } from "cookies-next";
+import { Provider } from "react-redux";
+import store from '../lib/store'
 
 const drawerWidth = 240;
 export const revalidate = 1800 // revalidate cached data at most every 30 mins
@@ -118,6 +121,16 @@ export default function Layout({ children }) {
     setOpen(false);
   };
 
+
+
+  useEffect(() => {
+    const user_coach = getCookie('user_coach') == 'true';
+    if (!(user_coach)){
+      router.push('/')
+    }
+    
+  }, [])
+
   return (
 
       <Box sx={{display: "flex"}}>
@@ -209,9 +222,11 @@ export default function Layout({ children }) {
             ))}
           </List>
         </Drawer>
-        <Box component="main" sx={{flexGrow: 1, p: 5}} className='bg-white-0'>
+        <Box component="main" sx={{flexGrow: 1, p: 5}} className='bg-white'>
           <DrawerHeader/>
-          {children}
+          <Provider store={store}>
+            {children}
+          </Provider>
         </Box>
       </Box>
   );

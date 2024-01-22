@@ -26,7 +26,10 @@ export default function AuthForm({open, setOpen, setUser}) {
                     'phone' : userData.phone,
                     'coach' : coach
                 }
-                setCookie('user', _user )
+                setCookie('user_name', userData.fname + " " + userData.lname )
+                setCookie('user_phone', userData.phone )
+                setCookie('user_coach', coach )
+                
                 setUser(_user)
             }
         })
@@ -99,7 +102,7 @@ export default function AuthForm({open, setOpen, setUser}) {
             </DialogContent>
             <DialogActions className='text-green-500'>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button  color="success" type="submit">Subscribe</Button>
+            <Button  color="success" type="submit">Login</Button>
             </DialogActions>
         </Dialog>
     );

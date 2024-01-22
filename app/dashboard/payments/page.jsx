@@ -1,34 +1,46 @@
 'use client'
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {Box, Paper, LinearProgress, Table, TableBody, 
     TableCell, TableContainer, TableHead, TablePagination, TableRow} from '@mui/material';
 
 import MuiAlert from '@mui/material/Alert';
 import SearchBar from "@/app/ui/dashboard/trainees/searchBar"
+import { setErrorStatus, setPaymentsList } from "@/app/lib/store/slices/paymentsSlice";
 
+export async function getPayments () {
+    try {
+      const res = await fetch(`/api/payments`, { next: { tags: ['payments'] } })
+      if (res.ok) {
+        return res.json().map(payment => {
+          const createdAt = new Date(payment.createdAt)
+          return {...payment, createdAt:createdAt.toLocaleDateString('en-GB')}
+      });
+  
+      } else {
+        throw new Error('Something went wrong');
+      }
+  
+    } catch {
+      return false
+    }
+  }
 
 const columns = [
   { id: 'id', label: 'ID', minWidth: 60},
   { id: 'trainee', label: 'Name', minWidth: 150},
-  {
-    id: 'amount', 
-    label: 'Amount',
-    minWidth: 60,
-  },
-  {
-    id: 'createdAt',
-    label: 'Date',
-    minWidth: 150,
-  },
+  { id: 'amount', label: 'Amount', minWidth: 60},
+  { id: 'createdAt', label: 'Date', minWidth: 150}
 ];
 
 export default function Payments () {
     const [page, setPage] = useState(0);
-    const [status, setStatus] = useState(0);
     const [query, setQuery] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [paymentsData, setPaymentsData] = useState(false);
     const [filteredData, setFilteredData] = useState(false);
+    const {paymentsList, status} = useSelector(state => state.paymentsList)
+
+    const dispatch = useDispatch()
 
     const handleChangePage = (event, newPage) => {
       setPage(newPage);
@@ -40,34 +52,27 @@ export default function Payments () {
     };
 
     useEffect(()=>{
-        if (paymentsData) {
-            setFilteredData(paymentsData.filter(payment => {
+        if (paymentsList) {
+            setFilteredData(paymentsList.filter(payment => {
                 return ((payment.trainee?.fname || "")+(payment.trainee?.mname || "")+(payment.trainee?.lname || "")).toLowerCase().includes(query.toLowerCase())
             }))
+        }
+    },[query, paymentsList])
+
+    function fetchPayments () {
+        const payments = getPayments()
+        if (payments) {
+            dispatch(setPaymentsList(payments))
         } else {
-            fetch(`/api/payments`, { next: { tags: ['payments'] } })
-            .then((response)=>{
-                if (response.ok) {
-                    setStatus(1)
-                    return response.json();
-                }
-                setStatus(-1)
-                throw new Error('Something went wrong');
-            })
-            .then((responseJson) => {
-                console.log(responseJson)
-                setPaymentsData(responseJson.map(payment => {
-                    const createdAt = new Date(payment.createdAt)
-                    return {...payment, createdAt:createdAt.toLocaleDateString('en-GB')}
-                }))
-            }).catch((e)=>{
-                setStatus(-1)
-                console.log(e)
-            })
-        } 
-
-    },[query, paymentsData])
-
+            dispatch(setErrorStatus())
+        }
+    }
+    
+    useEffect(() => {
+        if (status == 0) {
+            fetchPayments()
+        }
+    }, [])
 
     return (
         <Box className="bg-green-100">
@@ -112,7 +117,7 @@ export default function Payments () {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 20, 50]}
                     component="div"
-                    count={paymentsData.length}
+                    count={paymentsList.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}

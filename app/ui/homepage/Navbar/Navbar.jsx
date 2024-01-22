@@ -18,6 +18,7 @@ import {
   MenuItem,
   useScrollTrigger,
   Zoom,
+  Divider,
 } from "@mui/material";
 
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -29,6 +30,7 @@ const admin_settings = ["Dashboard", "Logout"];
 
 import $ from 'jquery';
 import AuthForm from "../../authentication/AuthForm";
+import Link from "next/link";
 
 function Logo() {
   return (
@@ -57,6 +59,7 @@ export default function Navbar() {
     console.log("Logging Out")
     setUser(false)
     setCookie('user',undefined)
+    handleCloseUserMenu()
   }
 
   useEffect(()=>{
@@ -65,9 +68,13 @@ export default function Navbar() {
           setCurrSection(s);
       });
 
-      const _user = getCookie('user');
+      const _user = getCookie('user_name');
       if (_user != undefined){
-          setUser(_user)
+          setUser({
+            'name' : getCookie('user_name'),
+            'phone' : getCookie('user_phone'),
+            'coach' : getCookie('user_coach') == 'true'
+        })
       }
   },[])
   
@@ -109,7 +116,7 @@ export default function Navbar() {
   };
 
   return (
-    <AppBar position="fixed" className="border-b-2 border-white bg-slate-950">
+    <nav className="fixed border-b-2 border-white bg-slate-950 w-full z-10">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
@@ -230,20 +237,24 @@ export default function Navbar() {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
+                  <MenuItem>
+                    <Typography textAlign="center" fontWeight="bold">{user.name}</Typography>
+                  </MenuItem>
+                  <Divider />
                   {user.coach?
                   <MenuItem onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center">Dashboard</Typography>
+                    <Typography component={Link} href="/dashboard" textAlign="center">Dashboard</Typography>
                   </MenuItem>:
                   <MenuItem onClick={handleCloseUserMenu}>
                     <Typography textAlign="center">Add Session</Typography>
                   </MenuItem>}
-                  <MenuItem onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center" onClick={logout}>Logout</Typography>
+                  <MenuItem onClick={logout}>
+                    <Typography textAlign="center">Logout</Typography>
                   </MenuItem>
               </Menu>
             </Box>
           ) : (
-            <><Button variant="outlined" color="success" className="ms-12" onClick={() => setOpenLoginForm(true)}>
+            <><Button variant="outlined" color="success" classes="ms-8 lg:ms-24" onClick={() => setOpenLoginForm(true)}>
                   Login
               </Button>
               <AuthForm open={openLoginForm} setOpen={setOpenLoginForm} setUser={setUser}/>
@@ -273,6 +284,6 @@ export default function Navbar() {
           </Fab>
         </Box>
       </Zoom>
-    </AppBar>
+    </nav>
   );
 }

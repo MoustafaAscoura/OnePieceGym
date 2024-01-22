@@ -84,8 +84,8 @@ export default function Plans () {
                   className='rounded-lg'
                   size="large"
                 >
-                  <ToggleButton className='text-slate-500 rounded-lg' value="basic">Basic Plans</ToggleButton>
-                  <ToggleButton className='text-slate-500 rounded-lg' value="other">Other Plans</ToggleButton>
+                  <ToggleButton className='rounded-lg' sx={{color: 'grey'}} value="basic">Basic Plans</ToggleButton>
+                  <ToggleButton className='rounded-lg' sx={{color: 'grey'}} value="other">Other Plans</ToggleButton>
                 </ToggleButtonGroup>
             </div>
             <div className="w-full flex flex-row overflow-x-scroll slider mt-8 gap-4">
