@@ -13,19 +13,24 @@ const programsSlice = createSlice({
         setProgramsList: (state,action) => {
             state.programsList = action.payload
             if (action.payload.length > 0) {
-                state.status = 1
-                state.count = action.payload.length
+                state.status = 3
+            } else {
+                state.status = 2
             }
+            state.count = action.payload.length
+
         },
 
         removeFromProgramsList: (state,action) => {
             state.programsList = state.programsList.filter(program => program.id != action.payload)
             state.count = state.programsList.length
+            if (!state.programsList.length) state.status = 2
         },
 
         addToProgramsList: (state, action) => {
             state.programsList.push(action.payload)
             state.count += 1
+            if (state.status == 2) state.status = 3
         },
 
         editProgram: (state, action) => {

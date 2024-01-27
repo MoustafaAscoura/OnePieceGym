@@ -26,7 +26,7 @@ const paymentsSlice = createSlice({
         },
 
         setPaymentsSum: (state, action) => {
-            state.sum = action.payload
+            state.sum = action.payload || 0
             state.status = 1
         },
 

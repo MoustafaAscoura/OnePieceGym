@@ -8,12 +8,16 @@ export async function GET(request) {
 export async function POST(request) {
   const formData = await request.formData()
   const jsonData = Object.fromEntries(formData);
-  try {
-    const id = await addSession(jsonData)
-    return Response.json(id)
-  } catch ({ name, message }) {
-    return Response.json({ name, message },{status:400})
-  }
+
+  jsonData.traineeID = parseInt(jsonData.traineeID)
+  jsonData.coachID = parseInt(jsonData.coachID)
+  jsonData.rating =  parseFloat(jsonData.rating) || 5
+  jsonData.duration = parseFloat(jsonData.duration) || 1
+  
+  delete jsonData.hour
+
+  const id = await addSession(jsonData)
+  return Response.json(id)
 }
 
 export async function DELETE(request) {

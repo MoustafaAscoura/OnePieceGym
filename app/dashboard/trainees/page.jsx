@@ -28,6 +28,7 @@ export default function Trainees () {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [filteredData, setFilteredData] = useState([]);
     const {traineesList, status} = useSelector(state => state.traineesList)
+
     const dispatch = useDispatch()
 
     const handleChangePage = (event, newPage) => {
@@ -63,7 +64,7 @@ export default function Trainees () {
           dispatch(setErrorStatus())
       })
     }
-  
+
     useEffect(() => {
       if (status < 2) {
         fetchTrainees()

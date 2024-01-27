@@ -29,11 +29,8 @@ export default function Dashboard() {
         }
         throw new Error('Something went wrong');
     })
-    .then((responseJson) => {
-        dispatch(setTraineesCount(responseJson))
-    }).catch((e)=>{
-      console.log(e)
-    })
+    .then((responseJson) => dispatch(setTraineesCount(responseJson)))
+    .catch((e)=> console.log(e))
   }
 
   function fetchCoaches () {
@@ -44,10 +41,8 @@ export default function Dashboard() {
         }
         throw new Error('Something went wrong');
     })
-    .then((responseJson) => {
-      console.log("Coaches", responseJson)
-        dispatch(setCoachesList(responseJson.map(coach => serialize_coach(coach))))
-    }).catch((e)=>{
+    .then((responseJson) => dispatch(setCoachesList(responseJson.map(coach => serialize_coach(coach)))))
+    .catch((e)=>{
       console.log(e)
       dispatch(setCoachesError())
     })

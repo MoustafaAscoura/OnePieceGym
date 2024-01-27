@@ -15,7 +15,9 @@ import {
   Button,
   TextField,
   Divider,
-  Snackbar
+  Snackbar,
+  Select,
+  MenuItem
 } from "@mui/material";
 
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -26,11 +28,13 @@ import CircularProgress from "@mui/material/CircularProgress";
 import MuiAlert from "@mui/material/Alert";
 import PaymentDialog from "@/app/ui/dashboard/trainees/paymentDialog";
 import SessionDialog from "@/app/ui/dashboard/trainees/sessionDialog";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { removeFromTraineesList, editTrainee, addToTraineesList } from "@/app/lib/store/slices/traineesSlice";
-import {serialize_trainee} from "@/app/lib/utils/functions";
+import { serialize_trainee, serialize_coach} from "@/app/lib/utils/functions";
 import { addToPaymentsList } from "@/app/lib/store/slices/paymentsSlice";
 import { addToSessionsList } from "@/app/lib/store/slices/sessionsSlice";
+import { setCoachesList, setErrorStatus as setCoachesError } from "@/app/lib/store/slices/coachesSlice";
+import { setErrorStatus as setProgramsError, setProgramsList } from "@/app/lib/store/slices/programsSlice";
 
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -48,15 +52,41 @@ export default function TraineeDetails({
   const [paymentOpen, setPaymentOpen] = useState(false)
   const [sessionOpen, setSessionOpen] = useState(false)
   const [mode, setMode] = useState("show"); //show, edit, or create
+  const {coachesList, status: coachesStatus} = useSelector(state => state.coachesList)
+  const {programsList, status: programsStatus} = useSelector(state => state.programsList)
   const dispatch = useDispatch()
 
-  useEffect(()=>{
-    if (Object.keys(detailTrainee).length === 0) {
-      setMode("create")
-    } else {
-      setMode("show")
-    }
-  },[detailTrainee])
+  function fetchCoaches () {
+    fetch(`/api/coaches`)
+    .then((response)=>{
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('Something went wrong');
+    })
+    .then((responseJson) => dispatch(setCoachesList(responseJson.map(coach => serialize_coach(coach)))))
+    .catch((e)=>{
+        console.log(e)
+        dispatch(setCoachesError())
+    })
+}
+
+function fetchPrograms () {
+    fetch(`/api/programs`)
+    .then((response)=>{
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('Something went wrong');
+    })
+    .then((responseJson) => {
+        dispatch(setProgramsList(responseJson))
+    }).catch((e)=>{
+        console.log(e)
+        dispatch(setProgramsError())
+
+    })
+}
 
   const handleChange = (event) => {
     let val = event.target.value;
@@ -136,6 +166,7 @@ export default function TraineeDetails({
         setMode("show");
       })
       .catch((err) => {
+        console.log(err)
         if (err.name === "PrismaClientKnownRequestError") {
           setError("Invalid Relative Field - Coach or Program incorrect");
         } else {
@@ -163,11 +194,25 @@ export default function TraineeDetails({
   };
 
   useEffect(() => {
+    if (Object.keys(detailTrainee).length === 0) {
+      setMode("create")
+    } else {
+      setMode("show")
+    }
+
     if (detailTrainee) {
       const { current: descriptionElement } = descriptionElementRef;
       if (descriptionElement !== null) {
         descriptionElement.focus();
       }
+    }
+
+    if (coachesStatus < 2) {
+      fetchCoaches()
+    }
+
+    if (programsStatus < 2) {
+      fetchPrograms()
     }
   }, [detailTrainee]);
 
@@ -206,8 +251,10 @@ export default function TraineeDetails({
   
   const addSession = (formData) => {
     let createdAt = new Date(formData.get('createdAt'))
+    createdAt.setHours(formData.get('hour'))
+    console.log(777,createdAt)
     formData.set("createdAt", createdAt.toISOString());
-    formData.set('id', detailTrainee.id)
+    formData.set('traineeID', detailTrainee.id)
     formData.set('coachID', detailTrainee.coachID)
 
     fetch("/api/sessions", {
@@ -217,12 +264,21 @@ export default function TraineeDetails({
         .then(jsonResponse => {
           const d_serialized = serialize_trainee({...detailTrainee, sessions: [...detailTrainee.sessions, jsonResponse]})
           dispatch(editTrainee(d_serialized))
-          dispatch(addToSessionsList(jsonResponse))
+          const _createdAt = new Date(jsonResponse.createdAt)
+
+          dispatch(addToSessionsList({
+            ...jsonResponse,
+            startHour:_createdAt.toLocaleTimeString(), 
+            startDay:_createdAt.toLocaleDateString('en-GB')
+          }))
+
           setDetailTrainee(d_serialized)
           setPaymentOpen(false);
           setSessionOpen(false);
         })
-        .catch((err) => {setError("Something went wrong!");});
+        .catch((err) => {
+          console.log(err)
+          setError("Something went wrong!");});
     }
 
   return (
@@ -352,8 +408,19 @@ export default function TraineeDetails({
                         <Typography gutterBottom variant="subtitle1" color="text.secondary">
                             Coach ID
                         </Typography>
-                        <TextField name="coachID" fullWidth sx={{mb:2, mt:0}} required
-                        type="number" defaultValue={detailTrainee.coachID} variant="standard" margin="normal"/><Divider/></>}
+                        <Select
+                            defaultValue={detailTrainee?.coachID}
+                            name="coachID"
+                            fullWidth
+                            size="small"
+                            sx={{mb:2, mt:0}}
+                            required
+                          >
+                            {coachesList.map(coach => {
+                              return <MenuItem key={coach.id} value={coach.id}>{coach.fname + " " + coach.lname}</MenuItem>
+                            })}
+                          </Select>
+                        <Divider/></>}
 
                     </Grid>
                     {mode=="show"?<><Grid item container direction="row" >
@@ -378,8 +445,18 @@ export default function TraineeDetails({
                         <Typography gutterBottom variant="subtitle1" color="text.secondary">
                             Program ID
                         </Typography>
-                        <TextField name="programID" fullWidth sx={{mb:2, mt:0}} required
-                        type="number" defaultValue={detailTrainee.programID} variant="standard" margin="normal"/>
+                        <Select
+                          defaultValue={detailTrainee?.programID}
+                          name="programID"
+                          fullWidth
+                          size="small"
+                          sx={{mb:2, mt:0}}
+                          required
+                        >
+                          {programsList.map(prog => {
+                            return <MenuItem key={prog.id} value={prog.id}>{prog.name} - {prog.duration} {prog.period}</MenuItem>
+                          })}
+                        </Select>
                         <Divider/>
                         <Typography gutterBottom variant="subtitle1" color="text.secondary">
                             Birthdate

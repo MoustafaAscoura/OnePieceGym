@@ -1,72 +1,34 @@
 'use client'
 
-import './Plans.css'
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-
-const programs = {
-    'basic' : [{
-        'name': 'Starter',
-        'price': 450,
-        'duration': 'Month',
-        'description': 'Become a Member with only 450LE per month. You will get amazing packages!',
-        'features': ['2 Invitations', 'Nutrition Plan', 'Inbody', '1 Private Session']
-    },{
-        'name': 'Basic',
-        'price': 1000,
-        'duration': '3 Months',
-        'description': 'Join the Basic Package, and get a fair discount. Always ask for new offers!',
-        'features': ['4 Invitations', '2 Nutrition Plans', '3 Inbody', '2 Private Session', '2 Weeks Freezing'],
-        'badge': 'Top-seller'
-    },{
-        'name': 'Advanced',
-        'price': 1800,
-        'duration': '6 Months',
-        'description': 'You are our premium member. You get all a fair discount and offers.',
-        'features': ['6 Invitations', '4 Weekly Invitations', '3 Nutrition Plans', '6 Inbody', '4 Private Session']
-    },{
-        'name': 'Royal',
-        'price': 2800,
-        'duration': 'Year',
-        'description': 'Become a Member with only 450LE per month. You will get amazing packages!',
-        'features': ['10 Invitations', '8 Weeks Freezing', '4 Nutrition Plans', '10 Inbody', '10 Private Sessions'],
-        'badge': 'Best-value'
-    }], 
-    
-    'other' : [
-    {
-        'name': 'Zumba',
-        'price': 450,
-        'duration': 'Month',
-        'description': 'Lets do the ZUMBA dance!',
-        'features': ['2 Invitations', 'Nutrition Plan', 'Inbody'],
-    },{
-        'name': 'Rehab',
-        'price': 1000,
-        'duration': 'Month',
-        'description': '1 Month injury rehab with the best techniques and up-to-date knowledge',
-        'features': ['2 Invitations', 'Private Sessions', '2 Inbody', 'Specialized Programs', 'Essential Nutrition Plan'],
-        'badge': 'Top-seller'
-    },{
-        'name': 'Conditioning',
-        'price': 500,
-        'duration': 'Month',
-        'description': 'Prepare your body for competitions and unlock your full potential.',
-        'features': ['2 Invitations', 'Specialized Programs', 'Nutrition Plan', 'Inbody', 'Private Sessions']
-    },{
-        'name': 'Kickboxing',
-        'price': 450,
-        'duration': '1 Month',
-        'description': 'Become a Member with only 450LE per month. You will get amazing packages!',
-        'features': ['2 Invitations', 'Nutrition Plan', 'Inbody', 'Private Sessions'],
-    }]}
+import $ from 'jquery';
+import 'jquery-ui-dist/jquery-ui';
 
 export default function Plans () {
     const [type, setType] = useState("basic")
-    const handleChange = (event, newType) => {
-      setType(newType || type);
-    };
+    const handleChange = (event, newType) => setType(newType || type);
+    const [programs, setPrograms] = useState([])
+
+    useEffect(()=>{
+        $(".slider-child").draggable({ 
+            axis: "x",
+            revert: true
+        });
+
+        fetch(`/api/programs`)
+        .then((response)=>{
+            if (response.ok) return response.json();
+            throw new Error('Something went wrong');
+        })
+        .then((responseJson) => {
+            setPrograms(responseJson.map(program => {
+                program.trainees_count = program._count.trainees || 0
+                return program
+            }))
+        }).catch((e)=> console.log(e))
+    },[])
 
     return <section id="plans" className="bg-slate-950">
         <div className="py-8 px-4 mx-auto max-w-screen-2xl lg:py-16 lg:px-8">
@@ -88,18 +50,21 @@ export default function Plans () {
                   <ToggleButton className='rounded-lg' sx={{color: 'grey'}} value="other">Other Plans</ToggleButton>
                 </ToggleButtonGroup>
             </div>
-            <div className="w-full flex flex-row overflow-x-scroll slider mt-8 gap-4">
-                {programs[type].map(plan => {
+            <div className="mt-8 overflow-x-hidden slider cursor-grab">
+                <div className="w-full flex flex-row justify-center gap-4 slider-child">
+                {programs.filter(plan => {
+                    return (plan.show && ((plan.basic && type=="basic")||(!plan.basic && type=="other")))
+                }).map(plan => {
                     return <>
                         {/* Pricing Card */}
-                        <div className={`${plan.badge? 'relative' : ''} overflow-hidden flex-shrink-0 flex flex-col p-6 mx-auto w-80 text-center rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-4 dark:bg-gray-800 dark:text-white`}>
-                            {plan.badge? <p className={`absolute ${ plan.badge == "Top-seller" ? 'bg-green-500' : 'bg-yellow-500'} -rotate-45 px-16 -left-16 top-8`}>{plan.badge}</p> : <></>}
+                        <div className={`${plan.badge? 'relative' : ''} plan overflow-hidden flex-shrink-0 flex flex-col p-6 mx-auto w-80 text-center rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-4 dark:bg-gray-800 dark:text-white`}>
+                            {plan.badge.length? <p className={`absolute ${ plan.badge == "Top-seller" ? 'bg-green-500' : 'bg-yellow-500'} -rotate-45 px-16 -left-16 top-8`}>{plan.badge}</p> : <></>}
                             
                             <h3 className="mb-4 text-2xl font-semibold">{plan.name}</h3>
                             <p className="font-light text-gray-500 sm:text-lg dark:text-gray-400 mt-5 min-h-24">{plan.description}</p>
                             <div className="flex justify-center items-baseline my-4">
-                                <span className="mr-2 text-5xl font-extrabold ">£ {plan.price}</span>
-                                <span className="text-gray-500 dark:text-gray-400">/{plan.duration}</span>
+                                <span className="mr-2 text-5xl font-extrabold ">£ {plan.cost}</span>
+                                <span className="text-gray-500 dark:text-gray-400">/{plan.duration} {plan.period}</span>
                             </div>
                             {/* List */}
                             <ul role="list" className="mb-8 space-y-4 text-left">
@@ -117,7 +82,7 @@ export default function Plans () {
                         </div>
                     </>
                 })}
-
+                </div>
             </div>
         </div>
     </section>

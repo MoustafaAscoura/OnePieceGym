@@ -126,7 +126,7 @@ export default function Layout({ children }) {
   useEffect(() => {
     const user_coach = getCookie('user_coach') == 'true';
     if (!(user_coach)){
-      router.push('/')
+      // router.push('/')
     }
     
   }, [])

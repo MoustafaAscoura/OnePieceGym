@@ -49,7 +49,6 @@ export default function Programs () {
             throw new Error('Something went wrong');
         })
         .then((responseJson) => {
-            console.log("Programs", responseJson)
             dispatch(setProgramsList(responseJson.map(program => {
                 program.trainees_count = program._count.trainees || 0
                 return program

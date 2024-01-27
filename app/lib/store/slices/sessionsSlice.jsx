@@ -22,6 +22,7 @@ const sessionsSlice = createSlice({
         addToSessionsList: (state, action) => {
             state.sessionsList.unshift(action.payload)
             state.count += 1
+            state.status = 3
         },
 
         setSessionsCount: (state, action) => {

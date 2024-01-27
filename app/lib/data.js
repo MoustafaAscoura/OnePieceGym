@@ -323,12 +323,7 @@ export const addPayment = async (data) => {
 
 export const addSession = async (data) => {
     const newSession = await prisma.session.create({
-        data: { ...data,
-            traineeID: parseInt(data.id),
-            coachID: parseInt(data.coachID),
-            rating: data.rating? parseFloat(data.rating):5,
-            duration: data.duration? parseFloat(data.duration):1,
-        },
+        data: data,
       })
 
     return newSession

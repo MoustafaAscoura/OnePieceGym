@@ -49,13 +49,9 @@ export default function SearchBar({query, setQuery, createNew}) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <nav className="bg-green-300 rounded-t-lg">
-          <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+          <div className="w-full flex flex-row-reverse flex-wrap items-center justify-between p-4">
+            <input type="text" value={query} onChange={e=>setQuery(e.target.value)} id="search-navbar" className="block max-w-48 p-2 ps-10 text-sm border-none rounded-lg focus:ring-green-800 focus:border-green-600 " placeholder="Search..."/>
             {createNew?<Button onClick={e => createNew()} variant="outlined" color="success">Add New</Button>:<></>}
-            <div className="flex md:order-2">
-              <div className="relative">
-                <input type="text" value={query} onChange={e=>setQuery(e.target.value)} id="search-navbar" className="block w-full p-2 ps-10 text-sm border-none rounded-lg focus:ring-green-800 focus:border-green-600 " placeholder="Search..."/>
-              </div>
-            </div>
           </div>
       </nav>
     </Box>

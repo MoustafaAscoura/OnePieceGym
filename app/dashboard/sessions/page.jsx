@@ -142,7 +142,7 @@ export default function Sessions () {
                         );
                         })
                         : status == 2 ? <TableRow ><TableCell colSpan={9}><MuiAlert elevation={6} variant="filled" severity="info">No Data Found</MuiAlert></TableCell></TableRow>
-                        :status === -1 ? <TableRow ><TableCell colSpan={9}><MuiAlert elevation={6} variant="filled" severity="error">An Error Happened!</MuiAlert></TableCell></TableRow>
+                        : status == -1 ? <TableRow ><TableCell colSpan={9}><MuiAlert elevation={6} variant="filled" severity="error">An Error Happened!</MuiAlert></TableCell></TableRow>
                         :<TableRow ><TableCell colSpan={9}><LinearProgress/></TableCell></TableRow>}
                     </TableBody>
                 </Table>

@@ -166,6 +166,7 @@ export default function CoachDetails({
       aria-describedby="scroll-dialog-description"
       fullWidth={true}
       maxWidth="md"
+      component='form' onChange={e => handleChange(e)} onSubmit={e => handleSubmit(e)}
     >
       <DialogTitle id="scroll-dialog-title">Details</DialogTitle>
       <DialogContent dividers={true}>
@@ -178,31 +179,13 @@ export default function CoachDetails({
           <Paper sx={{ p: 2, margin: 'auto', flexGrow: 1, backgroundColor: (theme) =>
                   theme.palette.mode === 'dark' ? '#1A2027' : '#fff',}}>
 
-              <Grid container spacing={2} component='form' onChange={e => handleChange(e)} onSubmit={e => handleSubmit(e)}>
+              <Grid container spacing={2} >
                 <Grid item xs={12} sm={12} md={4} spacing={2} className='flex flex-col items-center py-5'>
                     <Avatar
                     alt="Remy Sharp"
                     src={detailCoach.img||"/assets/images/coach_annon.jpg"}
                     sx={{ width: 160, height: 160, marginBottom:4}}
                     />
-
-                    {mode === "create" ? 
-                    <Button variant="outlined" onClick={e => toggleEdit(e)} 
-                    startIcon={loading?<></>:<EditIcon />}>
-                        {loading? <CircularProgress sx={{mr:2}} size={20}/>:<></>}{loading?"Saving...":"Save"}
-                    </Button>
-                    : <>
-
-                    <Stack spacing={1} justifyContent="center"  alignItems="center" direction="row" useFlexGap flexWrap="wrap" className='w-full max-w-80'>
-                        <Button variant="outlined" onClick={e => toggleEdit(e)} 
-                        startIcon={loading?<></>:<EditIcon />} sx={{ flexGrow: 1 }}>
-                            {loading? <CircularProgress sx={{mr:2}} size={20}/>:<></>}{mode=="edit"?loading?"Saving...":"Save":"Edit"}
-                        </Button>
-                        <Button variant="outlined" color="error" onClick={() => {setOpenDelete(true)}} startIcon={<DeleteIcon />}>
-                            Delete
-                        </Button>
-                    </Stack>
-                    </>}
                 </Grid>
 
                 <Grid item xs={12} sm={12} md={8} >
@@ -332,6 +315,21 @@ export default function CoachDetails({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
+        {mode === "create" ? 
+            <Button variant="outlined" onClick={e => toggleEdit(e)} 
+            startIcon={loading?<></>:<EditIcon />}>
+                {loading? <CircularProgress sx={{mr:2}} size={20}/>:<></>}{loading?"Saving...":"Save"}
+            </Button>
+            : <>
+
+            <Button variant="outlined" onClick={e => toggleEdit(e)} 
+            startIcon={loading?<></>:<EditIcon />}>
+                {loading? <CircularProgress sx={{mr:2}} size={20}/>:<></>}{mode=="edit"?loading?"Saving...":"Save":"Edit"}
+            </Button>
+            <Button variant="outlined" color="error" onClick={() => {setOpenDelete(true)}} startIcon={<DeleteIcon />}>
+                Delete
+            </Button>
+        </>}
         <Button color="success" onClick={() => setDetailCoach(false)}>
           Close
         </Button>
