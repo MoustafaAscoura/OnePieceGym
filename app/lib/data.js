@@ -28,18 +28,10 @@ export const fetchCoaches = async () => {
     const res = await prisma.coach.findMany({
         orderBy: {id: 'asc'},
         include: {
-            sessions: {
-                select:{
-                    duration: true,
-                    createdAt: true
-                },
-                orderBy: {id: 'desc'}
-            },
-            trainees: {
-                select:{
-                    fname: true,
-                    lname: true,
-                    subscription_start: true
+            _count: {
+                select:{ 
+                    trainees: true, 
+                    sessions: true,
                 },
             },
         },
@@ -72,6 +64,7 @@ export const fetchSessions = async () => {
     try {
         const res = await prisma.session.findMany({
             orderBy: {id: 'desc'},
+            take: 100,
             include: {
                 trainee: {
                     select:{
@@ -169,25 +162,34 @@ export const editCoach = async (data) => {
         },
         data: data,
         include: {
-            sessions: {
-                select:{
-                    duration: true,
-                    createdAt: true
+            _count: {
+                select:{ 
+                    trainees: true, 
+                    sessions: true,
                 },
-                orderBy: {id: 'desc'}
             },
-            trainees: {
-                select:{
-                    fname: true,
-                    lname: true,
-                    subscription_start: true
-                },
-            }
         },
-
       })
 
     return updateCoach
+}
+
+export const editProgram = async (data) => {   
+    const updateProgram = await prisma.program.update({
+        where: {
+            id: parseInt(data.id),
+        },
+        data: data,
+        include: {
+            _count: {
+                select:{ 
+                    trainees: true, 
+                },
+            },
+        },
+      })
+
+    return updateProgram
 }
 
 export const createTrainee = async (data) => {
@@ -226,20 +228,12 @@ export const createCoach = async (data) => {
     const newCoach = await prisma.coach.create({
         data: data,
         include: {
-            sessions: {
-                select:{
-                    duration: true,
-                    createdAt: true
+            _count: {
+                select:{ 
+                    trainees: true, 
+                    sessions: true,
                 },
-                orderBy: {id: 'desc'}
             },
-            trainees: {
-                select:{
-                    fname: true,
-                    lname: true,
-                    subscription_start: true
-                },
-            }
         },
       })
 
@@ -264,15 +258,41 @@ export const deleteCoach = async (id) => {
     })
 
     return deletedCoach
+}
+
+export const deleteMessage = async (id) => {
+    const deletedMessage = await prisma.message.delete({
+        where: {
+            id: parseInt(id)
+        },
+    })
+
+    return deletedMessage
+}
+
+export const deleteSession = async (id) => {
+    const deletedSession = await prisma.session.delete({
+        where: {
+            id: parseInt(id)
+        },
+    })
+
+    return deletedSession
+}
+
+export const deleteProgram = async (id) => {
+    const deletedCoach = await prisma.program.delete({
+        where: {
+            id: parseInt(id)
+        },
+    })
+
+    return deletedCoach
 } 
 
 export const addPayment = async (data) => {
     const newPayment = await prisma.payment.create({
-        data: {
-            amount: data.amount,
-            createdAt: data.createdAt,
-            traineeID: data.id || null
-        },
+        data: data,
       })
     
     if (data.renew) {
@@ -303,9 +323,7 @@ export const addPayment = async (data) => {
 
 export const addSession = async (data) => {
     const newSession = await prisma.session.create({
-        data: {
-            description: data.description,
-            createdAt: data.createdAt,
+        data: { ...data,
             traineeID: parseInt(data.id),
             coachID: parseInt(data.coachID),
             rating: data.rating? parseFloat(data.rating):5,
@@ -316,9 +334,17 @@ export const addSession = async (data) => {
     return newSession
 }
 
-export const addProgram = async (data) => {
+export const createProgram = async (data) => {
     const newProgram = await prisma.program.create({
         data: data,
+        include: {
+            _count: {
+                select:{ 
+                    trainees: true, 
+                },
+            },
+        },
+
       })
 
     return newProgram
@@ -346,16 +372,6 @@ export const getCoach = async (id) => {
 
 export const countTrainees = async () => {
     const count = await prisma.trainee.count()
-    return count
-}
-
-export const countCoaches = async () => {
-    const count = await prisma.coach.count()
-    return count
-}
-
-export const countPrograms = async () => {
-    const count = await prisma.program.count()
     return count
 }
 

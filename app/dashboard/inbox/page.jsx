@@ -5,31 +5,25 @@ import {Box, Paper, LinearProgress, Table, TableBody,
 
 import MuiAlert from '@mui/material/Alert';
 import SearchBar from "@/app/ui/dashboard/trainees/searchBar"
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useDispatch, useSelector } from "react-redux";
+import { setMessagesList, setErrorStatus, setSeenMessage, removeMessage } from "@/app/lib/store/slices/messagesSlice";
 
 const columns = [
-  { id: 'id', label: 'ID', minWidth: 60},
-  { id: 'name', label: 'Name', minWidth: 150},
-  { id: 'phone', label: 'Phone', minWidth: 100},
-  {
-    id: 'message', 
-    label: 'Message',
-    minWidth: 100,
-  },
-  {
-    id: 'createdAt',
-    label: 'Date',
-    minWidth: 150,
-  },
+  { id: 'id', label: 'ID', minWidth: 20},
+  { id: 'name', label: 'Name', minWidth: 100},
+  { id: 'phone', label: 'Phone', minWidth: 70},
+  { id: 'message', label: 'Message', minWidth: 100, },
+  { id: 'createdAt', label: 'Date', minWidth: 100, },
 ];
 
 export default function Inbox () {
     const [page, setPage] = useState(0);
-    const [status, setStatus] = useState(0);
     const [query, setQuery] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [messagesData, setMessagesData] = useState(false);
-    const [filteredData, setFilteredData] = useState(false);
-
+    const [filteredData, setFilteredData] = useState([]);
+    const dispatch = useDispatch()
+    const {status, messagesList} = useSelector(state => state.messagesList)
     const handleChangePage = (event, newPage) => {
       setPage(newPage);
     };
@@ -39,53 +33,57 @@ export default function Inbox () {
       setPage(0);
     };
 
-    const seeMessage = (id, index) =>{
+    const seeMessage = (id) =>{
         fetch(`/api/messages?id=${id}`, {method:"PATCH"})
         .then((response)=>{
             if (response.ok) {
-                setStatus(1)
                 return response.json();
             }
-            setStatus(-1)
             throw new Error('Something went wrong');
         })
         .then((responseJson) => {
-            console.log(responseJson)
-            const messages_ = [...messagesData]
-            messages_[index] = {...messages_[index], read: true}
-            setMessagesData(messages_)
+            dispatch(setSeenMessage(id))
         }).catch((e)=>{
-            setStatus(-1)
-            console.log(e)
+            dispatch(setErrorStatus())
         })
     }
+
+    const deleteMessage = (id) =>{
+        fetch(`/api/messages?id=${id}`, {method:"DELETE"})
+        .then((response)=>{
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Something went wrong');
+        })
+        .then(() => dispatch(removeMessage(id)))
+        .catch((e)=> console.log(e))
+    }
+
     useEffect(()=>{
-        if (messagesData) {
-            setFilteredData(messagesData.filter(message => {
+        if (status > 1) {
+            setFilteredData(messagesList.filter(message => {
                 return (message.name + message.message).toLowerCase().includes(query.toLowerCase())
             }))
         } else {
             fetch(`/api/messages`, { next: { tags: ['messages'] } })
             .then((response)=>{
                 if (response.ok) {
-                    setStatus(1)
                     return response.json();
                 }
-                setStatus(-1)
                 throw new Error('Something went wrong');
             })
             .then((responseJson) => {
-                setMessagesData(responseJson.map(message => {
+                dispatch(setMessagesList(responseJson.map(message => {
                     const createdAt = new Date(message.createdAt)
                     return {...message, createdAt:createdAt.toUTCString()}
-                }))
+                })))
             }).catch((e)=>{
-                setStatus(-1)
-                console.log(e)
+                dispatch(setErrorStatus())
             })
         } 
 
-    },[query, messagesData])
+    },[query, messagesList])
 
 
     return (
@@ -106,12 +104,13 @@ export default function Inbox () {
                                 
                             </TableCell>
                             ))}
+                            <TableCell align='center' style={{ minWidth: 20 }}>Delete</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                    {status == 1? filteredData.length? filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((message, index) => {
+                    {status === 3? filteredData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((message, index) => {
                         return (
-                            <TableRow className={message.read?"":"bg-gray-300"} onClick={e => {if (!message.read){seeMessage(message.id, index)}}} hover role="checkbox" tabIndex={-1} key={index}>
+                            <TableRow className={message.read?"":"bg-gray-300"} onClick={() => {if (!message.read){seeMessage(message.id)}}} hover role="checkbox" tabIndex={-1} key={index}>
                             {columns.map((column) => {
                                 const value = message[column.id];
                                 return (
@@ -120,18 +119,20 @@ export default function Inbox () {
                                 </TableCell>
                                 );
                             })}
+                            <TableCell align='center'> <DeleteIcon color="error" onClick={() => {deleteMessage(message.id)}}/> </TableCell>
                             </TableRow>
+
                         );
-                        }): <TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="info">No Data Found</MuiAlert></TableCell></TableRow>
-                        :status == 0 ? <TableRow ><TableCell colSpan={8}><LinearProgress/></TableCell></TableRow>
-                        :<TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="error">An Error Happened!</MuiAlert></TableCell></TableRow>}
+                        }): status == 2 ?<TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="info">No Data Found</MuiAlert></TableCell></TableRow>
+                        :status == -1 ? <TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="error">An Error Happened!</MuiAlert></TableCell></TableRow>
+                        :<TableRow ><TableCell colSpan={8}><LinearProgress/></TableCell></TableRow>}
                     </TableBody>
                 </Table>
                 </TableContainer>
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 20, 50]}
                     component="div"
-                    count={messagesData.length}
+                    count={messagesList.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}

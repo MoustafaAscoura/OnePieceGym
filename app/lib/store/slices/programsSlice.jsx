@@ -14,7 +14,13 @@ const programsSlice = createSlice({
             state.programsList = action.payload
             if (action.payload.length > 0) {
                 state.status = 1
+                state.count = action.payload.length
             }
+        },
+
+        removeFromProgramsList: (state,action) => {
+            state.programsList = state.programsList.filter(program => program.id != action.payload)
+            state.count = state.programsList.length
         },
 
         addToProgramsList: (state, action) => {
@@ -22,8 +28,9 @@ const programsSlice = createSlice({
             state.count += 1
         },
 
-        setProgramsCount: (state, action) => {
-            state.count = action.payload
+        editProgram: (state, action) => {
+            let index = state.programsList.findIndex(elem => elem.id == action.payload.id)
+            state.programsList[index] = action.payload
         },
 
         setErrorStatus: (state) => {
@@ -32,5 +39,5 @@ const programsSlice = createSlice({
     }
 })
 
-export const {setProgramsList, addToProgramsList, setErrorStatus, setProgramsCount} = programsSlice.actions
+export const {setProgramsList, addToProgramsList, setErrorStatus, removeFromProgramsList, editProgram} = programsSlice.actions
 export default programsSlice.reducer;

@@ -254,7 +254,7 @@ export default function Navbar() {
               </Menu>
             </Box>
           ) : (
-            <><Button variant="outlined" color="success" classes="ms-8 lg:ms-24" onClick={() => setOpenLoginForm(true)}>
+            <><Button variant="outlined" color="success" className="ms-8 lg:ms-24" onClick={() => setOpenLoginForm(true)}>
                   Login
               </Button>
               <AuthForm open={openLoginForm} setOpen={setOpenLoginForm} setUser={setUser}/>

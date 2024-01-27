@@ -12,18 +12,27 @@ const sessionsSlice = createSlice({
     reducers:{
         setSessionsList: (state,action) => {
             state.sessionsList = action.payload
-            if (action.payload.length > 0) {
-                state.status = 1
+            if (action.payload.length) {
+                state.status = 3
+            } else {
+                state.status = 2
             }
         },
 
         addToSessionsList: (state, action) => {
-            state.sessionsList.push(action.payload)
+            state.sessionsList.unshift(action.payload)
             state.count += 1
         },
 
         setSessionsCount: (state, action) => {
             state.count = action.payload
+            state.status = 1
+        },
+
+        removeSession: (state, action) => {
+            state.sessionsList = state.sessionsList.filter(session => session.id != action.payload)
+            state.count -= 1
+            if (!state.count) state.status = 2
         },
 
         setErrorStatus: (state) => {
@@ -32,5 +41,5 @@ const sessionsSlice = createSlice({
     }
 })
 
-export const {setSessionsList, addToSessionsList, setErrorStatus, setSessionsCount} = sessionsSlice.actions
+export const {setSessionsList, addToSessionsList, setErrorStatus, setSessionsCount, removeSession} = sessionsSlice.actions
 export default sessionsSlice.reducer;

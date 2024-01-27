@@ -1,4 +1,4 @@
-import { fetchMessages, seeMessage, createMessage } from "@/app/lib/data"
+import { fetchMessages, seeMessage, createMessage, deleteMessage } from "@/app/lib/data"
 
 export async function GET(request) {
   const res = await fetchMessages()
@@ -20,5 +20,11 @@ export async function POST(request) {
 export async function PATCH(request) {
   const id = request.nextUrl.searchParams.get("id")
   const res = seeMessage(parseInt(id))
+  return Response.json(res)
+}
+
+export async function DELETE(request) {
+  const id = request.nextUrl.searchParams.get("id")
+  const res = deleteMessage(parseInt(id))
   return Response.json(res)
 }

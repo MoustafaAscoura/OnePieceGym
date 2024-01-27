@@ -6,25 +6,7 @@ import {Box, Paper, LinearProgress, Table, TableBody,
 
 import MuiAlert from '@mui/material/Alert';
 import SearchBar from "@/app/ui/dashboard/trainees/searchBar"
-import { setErrorStatus, setPaymentsList } from "@/app/lib/store/slices/paymentsSlice";
-
-export async function getPayments () {
-    try {
-      const res = await fetch(`/api/payments`, { next: { tags: ['payments'] } })
-      if (res.ok) {
-        return res.json().map(payment => {
-          const createdAt = new Date(payment.createdAt)
-          return {...payment, createdAt:createdAt.toLocaleDateString('en-GB')}
-      });
-  
-      } else {
-        throw new Error('Something went wrong');
-      }
-  
-    } catch {
-      return false
-    }
-  }
+import { setErrorStatus, setPaymentsList, setPaymentsSum } from "@/app/lib/store/slices/paymentsSlice";
 
 const columns = [
   { id: 'id', label: 'ID', minWidth: 60},
@@ -37,8 +19,8 @@ export default function Payments () {
     const [page, setPage] = useState(0);
     const [query, setQuery] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [filteredData, setFilteredData] = useState(false);
-    const {paymentsList, status} = useSelector(state => state.paymentsList)
+    const [filteredData, setFilteredData] = useState([]);
+    const {paymentsList, status, sum} = useSelector(state => state.paymentsList)
 
     const dispatch = useDispatch()
 
@@ -51,28 +33,50 @@ export default function Payments () {
       setPage(0);
     };
 
+    const fetchPayments = () => {
+        fetch(`/api/payments`, { next: { tags: ['payments'] } })
+        .then((response)=>{
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Something went wrong');
+        })
+        .then((responseJson) => {
+            dispatch(setPaymentsList(responseJson.map(payment => {
+                const createdAt = new Date(payment.createdAt)
+                return {...payment, createdAt:createdAt.toLocaleDateString('en-GB')}
+            })))
+        }).catch((e)=>{
+            dispatch(setErrorStatus())
+        })
+    }
+    
+    function calcPayments () {
+        fetch(`/api/payments/latest`)
+        .then((response)=>{
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Something went wrong');
+        })
+        .then((responseJson) => {
+            dispatch(setPaymentsSum(responseJson._sum.amount))
+        }).catch((e)=>{
+            console.log(e)
+        })
+    }
+
     useEffect(()=>{
-        if (paymentsList) {
+        if (status > 1) {
             setFilteredData(paymentsList.filter(payment => {
                 return ((payment.trainee?.fname || "")+(payment.trainee?.mname || "")+(payment.trainee?.lname || "")).toLowerCase().includes(query.toLowerCase())
             }))
+        } else {
+            fetchPayments()
         }
     },[query, paymentsList])
 
-    function fetchPayments () {
-        const payments = getPayments()
-        if (payments) {
-            dispatch(setPaymentsList(payments))
-        } else {
-            dispatch(setErrorStatus())
-        }
-    }
-    
-    useEffect(() => {
-        if (status == 0) {
-            fetchPayments()
-        }
-    }, [])
+
 
     return (
         <Box className="bg-green-100">
@@ -95,7 +99,7 @@ export default function Payments () {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                    {status == 1? filteredData.length? filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((payment, index) => {
+                    {status === 3? filteredData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((payment, index) => {
                         return (
                             <TableRow hover role="checkbox" tabIndex={-1} key={index}>
                             {columns.map((column) => {
@@ -108,9 +112,9 @@ export default function Payments () {
                             })}
                             </TableRow>
                         );
-                        }): <TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="info">No Data Found</MuiAlert></TableCell></TableRow>
-                        :status == 0 ? <TableRow ><TableCell colSpan={8}><LinearProgress/></TableCell></TableRow>
-                        :<TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="error">An Error Happened!</MuiAlert></TableCell></TableRow>}
+                        }): status === 2 ? <TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="info">No Data Found</MuiAlert></TableCell></TableRow>
+                        :status === -1 ? <TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="error">An Error Happened!</MuiAlert></TableCell></TableRow>
+                        :<TableRow ><TableCell colSpan={8}><LinearProgress/></TableCell></TableRow>}
                     </TableBody>
                 </Table>
                 </TableContainer>

@@ -58,13 +58,17 @@ model Session {
 }
 
 model Program {
-  id        Int       @id @default(autoincrement()) 
+  id        Int     @id @default(autoincrement())
   name      String
   cost      Int
   period    String
-  duration  Int
+  duration  Int @default(1)
   description  String
   trainees  Trainee[]
+  features  String[]
+  badge     String?
+  basic     Boolean?  @default(true)
+  show     Boolean?  @default(true)
 }
 
 model Message {
@@ -78,8 +82,8 @@ model Message {
 
 model Payment {
   id          Int       @id @default(autoincrement())
-  trainee     Trainee? @relation(fields: [traineeID], references: [id])
-  traineeID   Int?
+  trainee     Trainee @relation(fields: [traineeID], references: [id])
+  traineeID   Int
   amount      Int
   createdAt   DateTime  @default(now())
 }

@@ -10,23 +10,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { setErrorStatus, setTraineesList } from "../../lib/store/slices/traineesSlice";
 import { serialize_trainee } from "@/app/lib/utils/functions";
 
-export async function getTrainees () {
-    try {
-      const res = await fetch(`/api/trainees`, { next: { tags: ['trainees'] } })
-      if (res.ok) {
-        return res.json().map(trainee => {
-          return serialize_trainee(trainee)
-      });
-  
-      } else {
-        throw new Error('Something went wrong');
-      }
-  
-    } catch {
-      return false
-    }
-  }
-
 const columns = [
   { id: 'id', label: 'ID', minWidth: 60},
   { id: 'name', label: 'Name', minWidth: 150},
@@ -43,7 +26,7 @@ export default function Trainees () {
     const [query, setQuery] = useState("");
     const [detailTrainee, setDetailTrainee] = useState(false)
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [filteredData, setFilteredData] = useState(false);
+    const [filteredData, setFilteredData] = useState([]);
     const {traineesList, status} = useSelector(state => state.traineesList)
     const dispatch = useDispatch()
 
@@ -57,7 +40,7 @@ export default function Trainees () {
     };
 
     useEffect(()=>{
-        if (traineesList) {
+        if (status == 3) {
             setFilteredData(traineesList.filter(trainee => {
                 return (trainee.fname+trainee.mname+trainee.lname).toLowerCase().includes(query.toLowerCase())
             }))
@@ -65,16 +48,24 @@ export default function Trainees () {
     },[query, traineesList])
   
     function fetchTrainees () {
-      const trainees = getTrainees()
-      if (trainees) {
-        dispatch(setTraineesList(trainees))
-      } else {
-        dispatch(setErrorStatus())
-      }
+      fetch(`/api/trainees`, { next: { tags: ['trainees'] } })
+      .then((response)=>{
+          if (response.ok) {
+              return response.json();
+          }
+          throw new Error('Something went wrong');
+      })
+      .then((responseJson) => {
+          dispatch(setTraineesList(responseJson.map(trainee => {
+              return serialize_trainee(trainee)
+          })))
+      }).catch((e)=>{
+          dispatch(setErrorStatus())
+      })
     }
   
     useEffect(() => {
-      if (status == 0) {
+      if (status < 2) {
         fetchTrainees()
       }
     }, [])
@@ -100,7 +91,7 @@ export default function Trainees () {
                     </TableRow>
                     </TableHead>
                     <TableBody>
-                    {status == 1? filteredData.length? filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((trainee, index) => {
+                    {status == 3? filteredData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((trainee, index) => {
                         return (
                             <TableRow hover role="checkbox" onClick={e=>setDetailTrainee(trainee)} tabIndex={-1} key={index}>
                             {columns.map((column) => {
@@ -113,9 +104,9 @@ export default function Trainees () {
                             })}
                             </TableRow>
                         );
-                        }): <TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="info">No Data Found</MuiAlert></TableCell></TableRow>
-                        :status == 0 ? <TableRow ><TableCell colSpan={8}><LinearProgress/></TableCell></TableRow>
-                        :<TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="error">An Error Happened!</MuiAlert></TableCell></TableRow>}
+                        }): status == 2 ?<TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="info">No Data Found</MuiAlert></TableCell></TableRow>
+                        :status == -1 ? <TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="error">An Error Happened!</MuiAlert></TableCell></TableRow>
+                        :<TableRow ><TableCell colSpan={8}><LinearProgress/></TableCell></TableRow>}
                     </TableBody>
                 </Table>
                 </TableContainer>

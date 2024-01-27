@@ -7,18 +7,19 @@ import {useSelector, useDispatch} from 'react-redux'
 import { setTraineesCount } from "../lib/store/slices/traineesSlice";
 import { setPaymentsSum } from '../lib/store/slices/paymentsSlice';
 import { setSessionsCount } from '../lib/store/slices/sessionsSlice';
-import { setCoachesCount } from '../lib/store/slices/coachesSlice';
-import { setProgramsCount } from '../lib/store/slices/programsSlice';
+import { setCoachesList, setErrorStatus as setCoachesError } from '../lib/store/slices/coachesSlice';
+import { setProgramsList, setErrorStatus as setProgramsError } from '../lib/store/slices/programsSlice';
 import { setMessagesCount } from '../lib/store/slices/messagesSlice';
+import { serialize_coach } from '../lib/utils/functions';
 
 export default function Dashboard() {
   const dispatch = useDispatch()
-  const {count: traineesCount} = useSelector(state => state.traineesList)
-  const {count: coachesCount} = useSelector(state => state.coachesList)
-  const {count: sessionsCount} = useSelector(state => state.sessionsList)
-  const {count: programsCount} = useSelector(state => state.programsList)
-  const {unread: messagesCount} = useSelector(state => state.messagesList)
-  const {sum : paymentsSum} = useSelector(state => state.paymentsList)
+  const {count: traineesCount, status: traineesStatus} = useSelector(state => state.traineesList)
+  const {count: coachesCount, status: coachesStatus} = useSelector(state => state.coachesList)
+  const {count: sessionsCount, status: sessionsStatus} = useSelector(state => state.sessionsList)
+  const {count: programsCount, status: programsStatus} = useSelector(state => state.programsList)
+  const {unread: messagesCount, status: messagesStatus} = useSelector(state => state.messagesList)
+  const {sum : paymentsSum, status: paymentsStatus} = useSelector(state => state.paymentsList)
 
   function countTrainees () {
     fetch(`/api/trainees/count`)
@@ -35,8 +36,8 @@ export default function Dashboard() {
     })
   }
 
-  function countCoaches () {
-    fetch(`/api/coaches/count`)
+  function fetchCoaches () {
+    fetch(`/api/coaches`)
     .then((response)=>{
         if (response.ok) {
             return response.json();
@@ -44,14 +45,16 @@ export default function Dashboard() {
         throw new Error('Something went wrong');
     })
     .then((responseJson) => {
-        dispatch(setCoachesCount(responseJson))
+      console.log("Coaches", responseJson)
+        dispatch(setCoachesList(responseJson.map(coach => serialize_coach(coach))))
     }).catch((e)=>{
       console.log(e)
+      dispatch(setCoachesError())
     })
   }
 
-  function countPrograms () {
-    fetch(`/api/programs/count`)
+  function fetchPrograms () {
+    fetch(`/api/programs`)
     .then((response)=>{
         if (response.ok) {
             return response.json();
@@ -59,9 +62,11 @@ export default function Dashboard() {
         throw new Error('Something went wrong');
     })
     .then((responseJson) => {
-        dispatch(setProgramsCount(responseJson))
+        dispatch(setProgramsList(responseJson))
     }).catch((e)=>{
       console.log(e)
+      dispatch(setProgramsError())
+
     })
   }
 
@@ -112,27 +117,24 @@ export default function Dashboard() {
 
 
   useEffect(() => {
-    if (!traineesCount){
+    if (traineesStatus < 1){
       countTrainees()
     }
-    if (!coachesCount){
-      countCoaches()
+    if (coachesStatus < 1){
+      fetchCoaches()
     }
-    if (!paymentsSum){
+    if (paymentsStatus < 1){
       calcPayments()
     }
-    if (!sessionsCount){
+    if (sessionsStatus < 1){
       countSessions()
     }
-    if (!programsCount){
-      countPrograms()
+    if (programsStatus < 1){
+      fetchPrograms()
     }
-    if (!messagesCount){
+    if (messagesStatus < 1){
       countMessages()
     }
-    
-
-     
   }, [])
 
 

@@ -1,4 +1,4 @@
-import { addSession, fetchSessions } from "@/app/lib/data"
+import { addSession, fetchSessions, deleteSession } from "@/app/lib/data"
 
 export async function GET(request) {
   const res = await fetchSessions()
@@ -14,4 +14,10 @@ export async function POST(request) {
   } catch ({ name, message }) {
     return Response.json({ name, message },{status:400})
   }
+}
+
+export async function DELETE(request) {
+  const id = request.nextUrl.searchParams.get("id")
+  const res = deleteSession(parseInt(id))
+  return Response.json(res)
 }

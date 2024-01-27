@@ -222,7 +222,7 @@ export default function Layout({ children }) {
             ))}
           </List>
         </Drawer>
-        <Box component="main" sx={{flexGrow: 1, p: 5}} className='bg-white'>
+        <Box component="main" sx={{flexGrow: 1, p: 5}} className='bg-white min-h-screen'>
           <DrawerHeader/>
           <Provider store={store}>
             {children}

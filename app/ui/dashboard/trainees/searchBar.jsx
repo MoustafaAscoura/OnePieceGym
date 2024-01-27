@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import { Button, InputBase, Toolbar, Box, AppBar } from '@mui/material';
@@ -49,23 +48,16 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function SearchBar({query, setQuery, createNew}) {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" >
-        <Toolbar className='justify-between bg-green-300 text-black'>
-          {createNew?<Button onClick={e => createNew()} variant="outlined" color="success">Add New</Button>:<></>}
-
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-              value={query}
-              onChange={e=>setQuery(e.target.value)}
-            />
-          </Search>
-        </Toolbar>
-      </AppBar>
+      <nav className="bg-green-300 rounded-t-lg">
+          <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            {createNew?<Button onClick={e => createNew()} variant="outlined" color="success">Add New</Button>:<></>}
+            <div className="flex md:order-2">
+              <div className="relative">
+                <input type="text" value={query} onChange={e=>setQuery(e.target.value)} id="search-navbar" className="block w-full p-2 ps-10 text-sm border-none rounded-lg focus:ring-green-800 focus:border-green-600 " placeholder="Search..."/>
+              </div>
+            </div>
+          </div>
+      </nav>
     </Box>
   );
 }

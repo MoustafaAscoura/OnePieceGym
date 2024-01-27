@@ -20,8 +20,8 @@ function getLabelText(value) {
   return `${value} Star${value !== 1 ? 's' : ''}, ${labels[value]}`;
 }
 
-export default function StarRating({id, name}) {
-  const [value, setValue] = React.useState(4.5);
+export default function StarRating({id, name, showvalue}) {
+  const [value, setValue] = React.useState(showvalue ? showvalue : 4.5);
   const [hover, setHover] = React.useState(-1);
 
   return (
@@ -33,6 +33,7 @@ export default function StarRating({id, name}) {
       }}
     >
       <Rating
+        readOnly={showvalue}
         name={name}
         id={id}
         value={value}

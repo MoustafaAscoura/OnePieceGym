@@ -58,10 +58,12 @@ export default function AuthForm({open, setOpen, setUser}) {
         >
             <DialogTitle>Login</DialogTitle>
             <DialogContent>
-            <DialogContentText textAlign='end '>
+            <DialogContentText>
                 <ToggleButton
                     value="check"
                     color = "success"
+                    className='my-4'
+                    size="small"
                     selected={coach}
                     onChange={() => {
                         setCoach(!coach);

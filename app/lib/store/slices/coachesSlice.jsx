@@ -3,7 +3,8 @@ import {createSlice} from '@reduxjs/toolkit'
 
 const Initial_State = {
     coachesList: [],
-    count: false
+    count: false,
+    status: 0
 }
 
 const coachesSlice = createSlice({
@@ -12,25 +13,39 @@ const coachesSlice = createSlice({
     reducers:{
         setCoachesList: (state,action) => {
             state.coachesList = action.payload
+            if (action.payload.length > 0) {
+                state.status = 3
+            } else {
+                state.status = 2
+            }
+            state.count = state.coachesList.length
+
         },
 
         addToCoachesList: (state, action) => {
             state.coachesList.push(action.payload)
-            state.count += 1
+            state.count = state.coachesList.length
+            if (state.status === 2) state.status = 3
 
+        },
+
+        editCoach: (state, action) => {
+            let index = state.coachesList.findIndex(elem => elem.id == action.payload.id)
+            state.coachesList[index] = action.payload
         },
 
         removeFromCoachesList: (state,action) => {
-            state.coachesList.pop(state.coachesList.indexOf(action.payload))
-            state.count -= 1
+            state.coachesList = state.coachesList.filter(coach => coach.id != action.payload)
+            state.count = state.coachesList.length
+            if (!state.coachesList.length) state.status = 2
 
         },
 
-        setCoachesCount: (state, action) => {
-            state.count = action.payload
+        setErrorStatus: (state) => {
+            state.status = -1
         }
     }
 })
 
-export const {setCoachesList, addToCoachesList, removeFromCoachesList, setCoachesCount} = coachesSlice.actions
+export const {setCoachesList, addToCoachesList, removeFromCoachesList, setErrorStatus, editCoach} = coachesSlice.actions
 export default coachesSlice.reducer;

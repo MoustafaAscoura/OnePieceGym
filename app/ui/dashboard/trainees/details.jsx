@@ -175,27 +175,33 @@ export default function TraineeDetails({
     let createdAt = new Date()
     formData.set("createdAt", createdAt.toISOString());
     formData.set("amount", parseInt(formData.get('amount')));
-    formData.set('id', detailTrainee.id)
-
-    if ( detailTrainee.status === "Membership Expired") {
-        formData.set('renew', detailTrainee.status === "Membership Expired")
-    }
+    formData.set('traineeID', detailTrainee.id)
 
     fetch("/api/payments", {
         method: "POST",
         body: formData,
       }).then(response => response.json())
         .then(jsonResponse => {
-          const d_ = formData.get('renew') ? { ...detailTrainee, ...jsonResponse }
+
+          const d_ = detailTrainee.status === "Membership Expired" ? { ...detailTrainee, ...jsonResponse }
           : {...detailTrainee, payments: [...detailTrainee.payments, jsonResponse]}
 
           const d_serialized = serialize_trainee(d_)
           dispatch(editTrainee(d_serialized))
-          dispatch(addToPaymentsList(jsonResponse))
+          const createdAt = new Date(jsonResponse.createdAt)
+          dispatch(addToPaymentsList({...jsonResponse, 
+            createdAt:createdAt.toLocaleDateString('en-GB'),
+            trainee:{
+              fname: detailTrainee.fname,
+              lname: detailTrainee.lname
+            }
+          }))
           setDetailTrainee(d_serialized)
           setPaymentOpen(false);
         })
-        .catch((err) => {setError("Something went wrong!");});
+        .catch((err) => {
+          console.log(err)
+          setError("Something went wrong!");});
     }
   
   const addSession = (formData) => {
@@ -254,7 +260,7 @@ export default function TraineeDetails({
                         {loading? <CircularProgress sx={{mr:2}} size={20}/>:<></>}{loading?"Saving...":"Save"}
                     </Button>
                     : <>
-                    <Chip sx={{marginBottom:5}} color={detailTrainee.status == "Valid Membership"?"success":"warning"} size="small" label={detailTrainee.status}/>
+                    <Chip sx={{marginBottom:5}} color={detailTrainee.status == "Valid Membership"?"success":detailTrainee.status == "Payment Due"?"warning":"error"} size="small" label={detailTrainee.status}/>
 
                     <Stack spacing={1} justifyContent="center"  alignItems="center" direction="row" useFlexGap flexWrap="wrap" className='w-full max-w-80'>
                         <Button variant="outlined" onClick={e => toggleEdit(e)} 

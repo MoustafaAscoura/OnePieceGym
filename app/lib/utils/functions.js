@@ -77,8 +77,8 @@ const serialize_coach = (coach) => {
     coach.birthdate = new Date(coach.birthdate)
     coach.name = coach.fname + (` ${coach.mname} ` || ' ') + coach.lname;
     coach.age = coach.birthdate ? calculate_age(coach.birthdate): '';
-    coach.sessions_count = coach.sessions.length + ` (${calculate_sessions_month(coach.sessions)} this month)`
-    coach.trainees_count = `(${coach.trainees.length} Trainees)`
+    coach.sessions_count = coach._count.sessions
+    coach.trainees_count = coach._count.trainees
     return coach
 }
 

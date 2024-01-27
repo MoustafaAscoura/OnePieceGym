@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState, forwardRef } from "react";
-import { styled } from "@mui/material/styles";
+import { useDispatch } from "react-redux";
 import {
   Grid,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -19,29 +18,19 @@ import {
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import TimerIcon from "@mui/icons-material/Timer";
 import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import { addToCoachesList, editCoach, removeFromCoachesList } from "@/app/lib/store/slices/coachesSlice";
 
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const Img = styled("img")({
-  margin: "auto",
-  display: "block",
-  maxWidth: "100%",
-  maxHeight: "100%",
-});
-
 export default function CoachDetails({
   detailCoach,
   setDetailCoach,
-  serialize_coach,
-  coachesData,
-  setCoachesData
+  serialize_coach
 }) {
   const descriptionElementRef = useRef(null);
   const [openDelete, setOpenDelete] = useState(false);
@@ -49,6 +38,7 @@ export default function CoachDetails({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [mode, setMode] = useState("show"); //show, edit, or create
+  const dispatch = useDispatch()
 
   useEffect(()=>{
     if (Object.keys(detailCoach).length === 0) {
@@ -122,10 +112,15 @@ export default function CoachDetails({
       .then((jsonResponse) => {
         const serialized_coach = serialize_coach({ ...detailCoach, ...jsonResponse })
         setDetailCoach( serialized_coach );
-        if (!formData.get('id')){setCoachesData([...coachesData,serialized_coach])}
+        if (!formData.get('id')){
+          dispatch(addToCoachesList(serialized_coach))
+        } else {
+          dispatch(editCoach(serialized_coach))
+        }
         setMode("show");
       })
       .catch((err) => {
+        console.log(err)
         if (err.name === "PrismaClientKnownRequestError") {
           setError("Invalid Relative Field - Coach or Program incorrect");
         } else {
@@ -143,7 +138,7 @@ export default function CoachDetails({
     })
       .then((response) => {
         setOpenDelete(false);
-        setCoachesData(coachesData.filter(coach => coach.id != detailCoach.id))
+        dispatch(removeFromCoachesList(detailCoach.id))
         setDetailCoach(false);
       })
       .catch((err) => {
@@ -165,7 +160,7 @@ export default function CoachDetails({
   return (
     <Dialog
       open={detailCoach}
-      onClose={(e) => setDetailCoach(false)}
+      onClose={() => setDetailCoach(false)}
       scroll="paper"
       aria-labelledby="scroll-dialog-title"
       aria-describedby="scroll-dialog-description"
@@ -203,7 +198,7 @@ export default function CoachDetails({
                         startIcon={loading?<></>:<EditIcon />} sx={{ flexGrow: 1 }}>
                             {loading? <CircularProgress sx={{mr:2}} size={20}/>:<></>}{mode=="edit"?loading?"Saving...":"Save":"Edit"}
                         </Button>
-                        <Button variant="outlined" color="error" onClick={e => {setOpenDelete(true)}} startIcon={<DeleteIcon />}>
+                        <Button variant="outlined" color="error" onClick={() => {setOpenDelete(true)}} startIcon={<DeleteIcon />}>
                             Delete
                         </Button>
                     </Stack>
@@ -304,7 +299,7 @@ export default function CoachDetails({
 
               {mode === "create" ? <></>:<>
                 <Dialog open={openDelete}
-                  onClose={e => setOpenDelete(false)}
+                  onClose={() => setOpenDelete(false)}
                   aria-labelledby="responsive-dialog-title">
                   <DialogTitle id="responsive-dialog-title">
                       {"Are you sure you want to delete this Person?"}
@@ -325,8 +320,8 @@ export default function CoachDetails({
                 </Dialog>
               </>}
 
-              <Snackbar open={error} autoHideDuration={6000} onClose={e=>setError(false)}>
-                  <Alert onClose={e=>setError(false)} severity="error" sx={{ width: '100%' }}>
+              <Snackbar open={error} autoHideDuration={6000} onClose={()=>setError(false)}>
+                  <Alert onClose={()=>setError(false)} severity="error" sx={{ width: '100%' }}>
                       {error}
                   </Alert>
               </Snackbar>
@@ -337,7 +332,7 @@ export default function CoachDetails({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button color="success" onClick={(e) => setDetailCoach(false)}>
+        <Button color="success" onClick={() => setDetailCoach(false)}>
           Close
         </Button>
       </DialogActions>

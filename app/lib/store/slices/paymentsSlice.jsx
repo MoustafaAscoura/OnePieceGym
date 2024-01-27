@@ -14,20 +14,25 @@ const paymentsSlice = createSlice({
         setPaymentsList: (state,action) => {
             state.paymentsList = action.payload
             if (action.payload.length > 0) {
-                state.status = 1
+                state.status = 3
+            } else {
+                state.status = 2
             }
         },
 
         addToPaymentsList: (state, action) => {
-            state.paymentsList.push(action.payload)
+            state.paymentsList.unshift(action.payload)
+            state.sum += action.payload.amount
         },
 
         setPaymentsSum: (state, action) => {
             state.sum = action.payload
+            state.status = 1
         },
 
         setErrorStatus: (state) => {
             state.status = -1
+            state.sum = false
         }
     }
 })

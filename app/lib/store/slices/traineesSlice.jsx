@@ -13,38 +13,34 @@ const traineesSlice = createSlice({
     reducers:{
         setTraineesList: (state,action) => {
             state.traineesList = action.payload
+            state.count = action.payload.length
             if (action.payload.length > 0) {
-                state.status = 1
+                state.status = 3
+            } else {
+                state.status = 2
             }
         },
 
         setTraineesCount: (state, action) => {
             state.count = action.payload
+            state.status = 1
         },
 
         addToTraineesList: (state, action) => {
             state.traineesList.push(action.payload)
             state.count += 1
+            if (state.status === 2) state.status = 3
         },
 
         removeFromTraineesList: (state,action) => {
             state.traineesList = state.traineesList.filter(trainee => trainee.id != action.payload)
             state.count -= 1
+            if (!state.traineesList.length) state.status = 2
         },
 
         editTrainee: (state, action) => {
-            console.log(action.payload)
             let index = state.traineesList.findIndex(elem => elem.id == action.payload.id)
-            console.log(index)
-            console.log(state.traineesList)
             state.traineesList[index] = action.payload
-            console.log(state.traineesList)
-        },
-
-        clearTraineesList: (state) => {
-            state.traineesList = []
-            state.status = 0
-            state.count = 0
         },
 
         setErrorStatus: (state) => {
@@ -53,5 +49,5 @@ const traineesSlice = createSlice({
     }
 })
 
-export const {setTraineesList, addToTraineesList, removeFromTraineesList, clearTraineesList, setErrorStatus, editTrainee, setTraineesCount} = traineesSlice.actions
+export const {setTraineesList, addToTraineesList, removeFromTraineesList, setErrorStatus, editTrainee, setTraineesCount} = traineesSlice.actions
 export default traineesSlice.reducer;
