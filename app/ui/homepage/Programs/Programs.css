@@ -1,19 +1,19 @@
-section div.flex.slider {
+section div.slider {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-section div.flex.slider::-webkit-scrollbar {
+section div.slider::-webkit-scrollbar {
   display: none;
 }
 
-section div.flex.slider > div {
+section div.slider > div {
     position: relative;
   }
 
-section div.flex.slider > div h4.caption {
+section div.slider > div h4.caption {
     position: absolute;
-    z-index: 100;
+    z-index: 20;
     bottom: 10px;
     font-weight: 800;
     font-size: 2.5rem;

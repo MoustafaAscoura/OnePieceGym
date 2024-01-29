@@ -28,8 +28,12 @@ export default function RootLayout({ children }) {
         <title>One Piece Gym</title>
       </Head>
       <body className={inter.className}>
+        <script async defer src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2"></script>
+
         {children}
         </body>
     </html>
+    
+    
   )
 }

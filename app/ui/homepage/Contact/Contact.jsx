@@ -17,7 +17,7 @@ export default function Contact () {
         }).catch((err) => {setMessage("Error");})
     }
 
-    return <section className="bg-gray-900 flex justify-around gap-2 px-8" id="contact">
+    return <section className="bg-gray-900 flex justify-around gap-2 px-8 py-16" id="contact">
         <div className='lg:flex justify-center items-center pb-3 lg:pt-5 hidden ps-8'>
             <img src='/assets/images/Contact.jpg' alt="" />
         </div>

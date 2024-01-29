@@ -12,11 +12,13 @@ import Coaches from '@/app/ui/homepage/Coaches/Coaches';
 import Plans from '@/app/ui/homepage/Plans/Plans';
 import Contact from '@/app/ui/homepage/Contact/Contact';
 import Footer from '@/app/ui/homepage/Footer/Footer';
+import Video from './ui/homepage/Video/Video';
 
 export default function Homepage () {
     return <>
-        <Navbar />
+        <Navbar/>
         <Hero/>
+        <Video/>
         <Services/>
         <Programs/>
         <Coaches/>

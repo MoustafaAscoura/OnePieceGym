@@ -50,8 +50,8 @@ export default function Plans () {
                   <ToggleButton className='rounded-lg' sx={{color: 'grey'}} value="other">Other Plans</ToggleButton>
                 </ToggleButtonGroup>
             </div>
-            <div className="mt-8 overflow-x-hidden slider cursor-grab">
-                <div className="w-full flex flex-row justify-center gap-4 slider-child">
+            <div className="mt-8 overflow-x-scroll slider cursor-grab">
+                <div className="w-full flex flex-row gap-4 slider-child">
                 {programs.filter(plan => {
                     return (plan.show && ((plan.basic && type=="basic")||(!plan.basic && type=="other")))
                 }).map(plan => {

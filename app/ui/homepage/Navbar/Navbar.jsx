@@ -116,7 +116,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed border-b-2 border-white bg-slate-950 w-full z-10">
+    <nav className="fixed border-b-2 border-white bg-slate-950 w-full z-50">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
@@ -254,7 +254,7 @@ export default function Navbar() {
               </Menu>
             </Box>
           ) : (
-            <><Button variant="outlined" color="success" className="ms-8 lg:ms-24" onClick={() => setOpenLoginForm(true)}>
+            <><Button variant="outlined" color="success" sx={{marginLeft:{xs:8, lg:16}}} onClick={() => setOpenLoginForm(true)}>
                   Login
               </Button>
               <AuthForm open={openLoginForm} setOpen={setOpenLoginForm} setUser={setUser}/>
