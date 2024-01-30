@@ -24,7 +24,7 @@ import {
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import MenuIcon from "@mui/icons-material/Menu";
 
-const pages = ["Home", "Services", "Programs", "Coaches", "Plans", "Contact"];
+const pages = ["Home", "Services", "Programs", "Coaches", "Plans", "Testimonials", "Contact"];
 const settings = ["Add Session", "Logout"];
 const admin_settings = ["Dashboard", "Logout"];
 

@@ -13,6 +13,7 @@ import Plans from '@/app/ui/homepage/Plans/Plans';
 import Contact from '@/app/ui/homepage/Contact/Contact';
 import Footer from '@/app/ui/homepage/Footer/Footer';
 import Video from './ui/homepage/Video/Video';
+import Testimonial from './ui/homepage/Testimonial/Testimonial';
 
 export default function Homepage () {
     return <>
@@ -23,6 +24,7 @@ export default function Homepage () {
         <Programs/>
         <Coaches/>
         <Plans/>
+        <Testimonial />
         <Contact/>
         <Footer/>
     </>

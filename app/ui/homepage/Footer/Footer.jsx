@@ -1,7 +1,7 @@
 import Image from 'next/image'
 
 export default function Footer () {
-    return <footer className="bg-slate-950">
+    return <footer className="bg-gray-900">
             <div className="mx-auto w-full max-w-screen-xl p-4">
                 <div className="py-24 sm:py-32">
                         <div className="mx-auto max-w-7xl px-6 lg:px-8">
