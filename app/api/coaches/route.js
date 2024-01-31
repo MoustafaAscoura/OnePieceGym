@@ -18,9 +18,10 @@ export async function POST(request) {
   }
   
   jsonData.birthdate = new Date(jsonData.birthdate)
-
+  console.log(jsonData)
   try {
     const id = jsonData.id ? await editCoach(jsonData) : await createCoach(jsonData)
+    console.log(id)
     return Response.json(id)
   } catch ({ name, message }) {
     return Response.json({ name, message },{status:400})

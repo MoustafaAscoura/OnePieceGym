@@ -116,7 +116,7 @@ export default function Coaches () {
                     showLastButton={true}
                 />
             </Paper>
-            <CoachDetails detailCoach={detailCoach} setDetailCoach={setDetailCoach} serialize_coach={serialize_coach}/>
+            <CoachDetails detailCoach={detailCoach} setDetailCoach={setDetailCoach}/>
         </Box>
     );
 }

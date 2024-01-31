@@ -21,7 +21,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import $ from 'jquery'
 import { addToCoachesList, editCoach, removeFromCoachesList } from "@/app/lib/store/slices/coachesSlice";
+import { serialize_coach } from "@/app/lib/utils/functions";
 
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -30,10 +32,10 @@ const Alert = forwardRef(function Alert(props, ref) {
 export default function CoachDetails({
   detailCoach,
   setDetailCoach,
-  serialize_coach
 }) {
   const descriptionElementRef = useRef(null);
   const [openDelete, setOpenDelete] = useState(false);
+  const [newImg, setNewImg] = useState(false)
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -46,6 +48,7 @@ export default function CoachDetails({
     } else {
       setMode("show")
     }
+    setNewImg(false)
   },[detailCoach])
 
   const handleChange = (event) => {
@@ -87,6 +90,22 @@ export default function CoachDetails({
     setFormErrors(formErrors_);
   };
 
+  const handleFileChange = (e) => {
+    const formData = new FormData()
+    formData.append("image",e.target.files[0])
+
+    fetch('https://api.imgbb.com/1/upload?key=19eef0c30d4e456159d5e0b43f9f632b', 
+      {method: 'POST', body: formData})
+    .then(res => res.json())
+    .then(jsonResponse => {
+        const inp = document.querySelector('input[name="image"]')
+        inp.disabled = false
+        inp.value = jsonResponse.data.url
+        setNewImg(jsonResponse.data.url)
+    })
+    .catch(err => console.log(err));
+  }
+
   const toggleEdit = (event) => {
     if (mode === "show") {
       setMode("edit");
@@ -101,8 +120,8 @@ export default function CoachDetails({
   };
 
   async function handleSubmit(formData) {
-
-    fetch("/api/coaches", {
+    formData.delete('img')
+    await fetch("/api/coaches", {
       method: "POST",
       body: formData,
     })
@@ -183,8 +202,9 @@ export default function CoachDetails({
                 <Grid item xs={12} sm={12} md={4} spacing={2} className='flex flex-col items-center py-5'>
                     <Avatar
                     alt="Remy Sharp"
-                    src={detailCoach.img||"/assets/images/coach_annon.jpg"}
-                    sx={{ width: 160, height: 160, marginBottom:4}}
+                    src={newImg || detailCoach.image||"/assets/images/trainee_annon.jpg"}
+                    sx={{ width: 250, height: 450, marginBottom:4}}
+                    variant="square"
                     />
                 </Grid>
 
@@ -251,6 +271,14 @@ export default function CoachDetails({
                             Birthdate
                         </Typography>
                         <input id="birthdate" name="birthdate" type="date" defaultValue={detailCoach.birthdate?.toISOString().split('T')[0]} required className="mt-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
+                        <Divider/>
+                        <Typography gutterBottom variant="subtitle1" color="text.secondary" sx={{mt:2}}>
+                            Image
+                        </Typography>
+                        <input id="image" name="img" type="file" onChange={e => handleFileChange(e)}
+                        className="block w-full my-4 text-sm text-slate-500 file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"/>
+                        <input type="text" name="image" hidden disabled defaultValue={detailCoach.image}/>
                         <Divider/>
                         </>}
 
