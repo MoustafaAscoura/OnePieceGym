@@ -1,42 +1,37 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
+import { Button, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText } from '@mui/material';
 import { setCookie } from 'cookies-next';
-import Button from '@mui/material/Button';
-import { ToggleButton, Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText } from '@mui/material';
+import { useRouter } from 'next/navigation';
+
 
 export default function AuthForm({open, setOpen, setUser}) {
-    const [coach, setCoach] = useState(false)
+    const [status, setStatus] = useState(0)
+    const router = useRouter()
 
-    const handleClose = () => {
-        setOpen(false);
-    };
+    useEffect(()=> setStatus(0),[])
+    
+    const handleClose = () => setOpen(false)
 
     async function handleSubmit(formData) {
-        formData.set('coach', coach)
-        fetch("/api/login", {
-        method: "POST",
-        body: formData,
-        })
-        .then((response) => {
-            return response.json();
-        })
+        setStatus(1)
+        fetch("/api/login", {method: "POST",body: formData,})
+        .then((response) => response.json())
         .then((userData) => {
-            if (userData && (userData.phone == formData.get('phone'))){
-                const _user = {
-                    'name' : userData.fname + " " + userData.lname,
-                    'phone' : userData.phone,
-                    'coach' : coach
-                }
-                setCookie('user_name', userData.fname + " " + userData.lname )
-                setCookie('user_phone', userData.phone )
-                setCookie('user_coach', coach )
-                
-                setUser(_user)
+            setStatus(2)
+            setTimeout(()=>setStatus(0),3000)
+            if (userData.coach) {
+                setCookie('coach',"123")
+                router.push('/dashboard')
+            } else {
+                setUser(userData)
             }
         })
         .catch((error) => {
             console.log(error)
+            setStatus(-1)
+            setTimeout(()=>setStatus(0),3000)
         })
-        .finally(() => setOpen(false));
+
     }
 
     return (
@@ -59,19 +54,6 @@ export default function AuthForm({open, setOpen, setUser}) {
             <DialogTitle>Login</DialogTitle>
             <DialogContent>
             <DialogContentText>
-                <ToggleButton
-                    value="check"
-                    color = "success"
-                    className='my-4'
-                    size="small"
-                    selected={coach}
-                    onChange={() => {
-                        setCoach(!coach);
-                    }}
-                    >
-                    Login as a coach
-                </ToggleButton>
-            </DialogContentText>
                 <div className='mb-8'>
                     <label htmlFor="id" className="block text-sm font-medium leading-6 text-gray-900">
                         Your Membership Id
@@ -101,10 +83,18 @@ export default function AuthForm({open, setOpen, setUser}) {
                         />
                     </div>
                 </div>
+            </DialogContentText>
+
             </DialogContent>
             <DialogActions className='text-green-500'>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button  color="success" type="submit">Login</Button>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button  color={status==-1?"error":"success"} type="submit" disabled={status==1}>
+                    {status==0?"Login"
+                    :status==1?"Loading..." 
+                    :status==2?"Redirecting..."
+                    :"Wrong ID and Phone"}
+                </Button>
+                
             </DialogActions>
         </Dialog>
     );

@@ -345,24 +345,37 @@ export const createProgram = async (data) => {
     return newProgram
 }
 
-export const getTrainee = async (id) => {
+export const getTrainee = async (data) => {
     const trainee = await prisma.trainee.findUnique({
-        where: {
-          id:parseInt(id),
-        },
+        where: data,
       })
     
       return trainee
 }
 
-export const getCoach = async (id) => {
+export const getCoach = async (data) => {
     const coach = await prisma.coach.findUnique({
+        where: data,
+    })
+    return coach
+}
+
+export const fetchSettings = async () => {
+    const settings = await prisma.settings.findUnique({
         where: {
-          id:parseInt(id),
+            id: 1,
         },
     })
-    
-    return coach
+    return settings
+}
+
+export const editSettings = async (data) => {   
+    const updateSettings = await prisma.settings.update({
+        where: {id: 1},
+        data: data,
+      })
+
+    return updateSettings
 }
 
 export const countTrainees = async () => {

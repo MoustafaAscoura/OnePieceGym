@@ -13,7 +13,6 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MailIcon from '@mui/icons-material/Mail';
 import LogoutIcon from "@mui/icons-material/Logout";
-import SettingsIcon from "@mui/icons-material/Settings";
 import BuildIcon from "@mui/icons-material/Build";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
@@ -101,8 +100,7 @@ export default function Layout({ children }) {
   const [open, setOpen] = useState(false);
 
   const icons = {
-    "Modify Website": <BuildIcon />,
-    "Settings": <SettingsIcon />,
+    "Website": <BuildIcon />,
     "Logout": <LogoutIcon />,
     "Inbox": <MailIcon />,
     "Trainees": <DirectionsRunIcon />,
@@ -117,19 +115,9 @@ export default function Layout({ children }) {
     setOpen(true);
   };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  const handleDrawerClose = () => setOpen(false);
 
-
-
-  useEffect(() => {
-    const user_coach = getCookie('user_coach') == 'true';
-    if (!(user_coach)){
-      // router.push('/')
-    }
-    
-  }, [])
+  useEffect(() => {if (getCookie('coach') != '123') router.push('/')}, [])
 
   return (
 
@@ -198,7 +186,7 @@ export default function Layout({ children }) {
           </List>
           <Divider/>
           <List>
-            {["Modify Website", "Settings", "Logout"].map((text, index) => (
+            {["Website", "Logout"].map((text, index) => (
                 <ListItem key={index} disablePadding sx={{display: "block"}}>
                   <ListItemButton onClick={() => router.push(`/dashboard/${text.toLowerCase()}`)}
                                   sx={{

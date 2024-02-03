@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { getCookie, setCookie } from 'cookies-next';
+import { getCookie } from 'cookies-next';
 import "./Navbar.css";
 import {
-  AppBar,
   Box,
   Toolbar,
   IconButton,
@@ -12,25 +11,21 @@ import {
   Fab,
   Menu,
   Container,
-  Avatar,
   Button,
   Tooltip,
   MenuItem,
   useScrollTrigger,
   Zoom,
-  Divider,
 } from "@mui/material";
 
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import MenuIcon from "@mui/icons-material/Menu";
 
-const pages = ["Home", "Services", "Programs", "Coaches", "Plans", "Testimonials", "Contact"];
-const settings = ["Add Session", "Logout"];
-const admin_settings = ["Dashboard", "Logout"];
-
-import $ from 'jquery';
+const pages = ["Home", "Services", "Programs", "Coaches", "Plans", "Contact"];
 import AuthForm from "../../authentication/AuthForm";
-import Link from "next/link";
+import $ from 'jquery';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import SessionDialog from "../../dashboard/trainees/sessionDialog";
 
 function Logo() {
   return (
@@ -51,21 +46,20 @@ function Logo() {
 export default function Navbar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [user, setUser] = useState(false)
+  const [userData, setUserData] = useState(false)
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [currSection, setCurrSection] = useState(0)
   const [openLoginForm, setOpenLoginForm] = useState(false)
 
-  const logout = (e) => {
-    console.log("Logging Out")
-    setUser(false)
-    setCookie('user',undefined)
+  useEffect(()=>{
+    if (user) setUserData(user)
     handleCloseUserMenu()
-  }
+  },[user])
 
   useEffect(()=>{
       $(document).on('scroll', function() {
-          let s = Math.floor($(document).scrollTop() / $(window).height())
-          setCurrSection(s);
+        let s = Math.floor($(document).scrollTop() / $(window).height())
+        setCurrSection(s);
       });
 
       const _user = getCookie('user_name');
@@ -114,6 +108,26 @@ export default function Navbar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  const handleOpenSession = () => {
+    if (userData) {
+      console.log(userData)
+      setUser(userData)
+    } else {
+      setOpenLoginForm(true)
+    }
+  }
+
+  const addSession = (formData) => {
+    let createdAt = new Date(formData.get('createdAt'))
+    createdAt.setHours(formData.get('hour'))
+    formData.set("createdAt", createdAt.toISOString());
+    formData.set('traineeID', user.id)
+    formData.set('coachID', user.coachID)
+
+    fetch("/api/sessions", {method: "POST",body: formData,})
+    .then(response => {setUser(false);setOpenLoginForm(false);})
+    .catch((err) => console.log(err))}
 
   return (
     <nav className="fixed border-b-2 border-white bg-slate-950 w-full z-50">
@@ -214,12 +228,10 @@ export default function Navbar() {
             ))}
           </Box>
 
-          {user ? (
-            <Box sx={{ flexGrow: 0, marginLeft: 5 }}>
-              <Tooltip title={user.name}>
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt={user.name} src="/assets/images/trainee_annon.jpg" />
-                </IconButton>
+
+            <Box sx={{flexGrow:0, marginLeft:{xs:8, lg:16}}}>
+              <Tooltip title={user.name} className="cursor-pointer">
+                  <AccountBoxIcon color="success" sx={{fontSize:"35px"}} onClick={handleOpenUserMenu}/>
               </Tooltip>
               <Menu
                 sx={{ mt: "45px" }}
@@ -237,29 +249,17 @@ export default function Navbar() {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                  <MenuItem>
-                    <Typography textAlign="center" fontWeight="bold">{user.name}</Typography>
-                  </MenuItem>
-                  <Divider />
-                  {user.coach?
-                  <MenuItem onClick={handleCloseUserMenu}>
-                    <Typography component={Link} href="/dashboard" textAlign="center">Dashboard</Typography>
-                  </MenuItem>:
-                  <MenuItem onClick={handleCloseUserMenu}>
+                  <MenuItem onClick={handleOpenSession}>
                     <Typography textAlign="center">Add Session</Typography>
-                  </MenuItem>}
-                  <MenuItem onClick={logout}>
-                    <Typography textAlign="center">Logout</Typography>
+                  </MenuItem>
+                  <MenuItem onClick={() => setOpenLoginForm(true)}>
+                    <Typography textAlign="center">Coaches Login</Typography>
                   </MenuItem>
               </Menu>
-            </Box>
-          ) : (
-            <><Button variant="outlined" color="success" sx={{marginLeft:{xs:8, lg:16}}} onClick={() => setOpenLoginForm(true)}>
-                  Login
-              </Button>
               <AuthForm open={openLoginForm} setOpen={setOpenLoginForm} setUser={setUser}/>
-          </>
-          )}
+              <SessionDialog open={user} setOpen={setUser} addSession={addSession}/>
+
+            </Box>
         </Toolbar>
       </Container>
       <Zoom in={trigger}>

@@ -1,5 +1,5 @@
 import {Dialog, DialogContent, DialogContentText, DialogTitle,
-    InputLabel, MenuItem, FormControl, Select} from '@mui/material';
+    MenuItem, FormControl, Select} from '@mui/material';
 import StarRating from './startRating';
 
 export default function SessionDialog({open, setOpen, addSession}) {

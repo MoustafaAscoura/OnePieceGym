@@ -87,3 +87,8 @@ model Payment {
   amount      Int
   createdAt   DateTime  @default(now())
 }
+
+model Settings {
+  id        Int       @id @default(autoincrement())
+  video     String?
+}

@@ -252,7 +252,6 @@ function fetchPrograms () {
   const addSession = (formData) => {
     let createdAt = new Date(formData.get('createdAt'))
     createdAt.setHours(formData.get('hour'))
-    console.log(777,createdAt)
     formData.set("createdAt", createdAt.toISOString());
     formData.set('traineeID', detailTrainee.id)
     formData.set('coachID', detailTrainee.coachID)

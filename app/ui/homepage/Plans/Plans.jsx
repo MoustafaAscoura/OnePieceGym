@@ -3,8 +3,6 @@
 import {useEffect, useState} from "react";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import $ from 'jquery';
-import 'jquery-ui-dist/jquery-ui';
 
 export default function Plans () {
     const [type, setType] = useState("basic")
@@ -12,10 +10,10 @@ export default function Plans () {
     const [programs, setPrograms] = useState([])
 
     useEffect(()=>{
-        $(".slider-child").draggable({ 
-            axis: "x",
-            revert: true
-        });
+        // $(".slider-child").draggable({ 
+        //     axis: "x",
+        //     revert: true
+        // });
 
         fetch(`/api/programs`)
         .then((response)=>{

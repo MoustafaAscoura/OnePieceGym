@@ -21,7 +21,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import $ from 'jquery'
 import { addToCoachesList, editCoach, removeFromCoachesList } from "@/app/lib/store/slices/coachesSlice";
 import { serialize_coach } from "@/app/lib/utils/functions";
 
