@@ -1,12 +1,8 @@
 import { fetchCoaches, editCoach, deleteCoach, createCoach } from "@/app/lib/data"
 
 export async function GET(request) {
-  try {
-      const res = await fetchCoaches()
+  const res = await fetchCoaches()
   return Response.json(res)
-  } catch ({ name, message }) {
-    return Response.json({ name, message },{status:400})
-  }
 }
 
 export async function POST(request) {
@@ -18,22 +14,12 @@ export async function POST(request) {
   }
   
   jsonData.birthdate = new Date(jsonData.birthdate)
-  console.log(jsonData)
-  try {
-    const id = jsonData.id ? await editCoach(jsonData) : await createCoach(jsonData)
-    console.log(id)
-    return Response.json(id)
-  } catch ({ name, message }) {
-    return Response.json({ name, message },{status:400})
-  }
+  const id = jsonData.id ? await editCoach(jsonData) : await createCoach(jsonData)
+  return Response.json(id)
 }
 
 export async function DELETE(request) {
   const data = await request.json()
-  try {
-    const id = await deleteCoach(data.id)
-    return new Response(null, {status:204})
-  } catch ({ name, message }) {
-    return Response.json({ name, message },{status:400})
-  }
+  const id = await deleteCoach(data.id)
+  return new Response(null, {status:204})
 }

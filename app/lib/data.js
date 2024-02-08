@@ -113,6 +113,13 @@ export const fetchPrograms = async () => {
     return res;
 }
 
+export const fetchTestimonials = async () => {
+    const res = await prisma.testimonial.findMany({
+        orderBy: {id: 'asc'},
+    })
+    return res;
+}
+
 export const seeMessage = async (id) => {   
     const seenMessage = await prisma.message.update({
         where: {
@@ -240,6 +247,13 @@ export const createCoach = async (data) => {
     return newCoach
 }
 
+export const createTestimonial = async (data) => {
+    const newTestimonial = await prisma.testimonial.create({
+        data: data,
+      })
+    return newTestimonial
+}
+
 export const deleteTrainee = async (id) => {
     const deletedTrainee = await prisma.trainee.delete({
         where: {
@@ -260,6 +274,15 @@ export const deleteCoach = async (id) => {
     return deletedCoach
 }
 
+export const deleteTestimonial = async (id) => {
+    const deletedTestimonial = await prisma.testimonial.delete({
+        where: {
+            id: parseInt(id)
+        },
+    })
+    return deletedTestimonial
+}
+
 export const deleteMessage = async (id) => {
     const deletedMessage = await prisma.message.delete({
         where: {
@@ -278,6 +301,16 @@ export const deleteSession = async (id) => {
     })
 
     return deletedSession
+}
+
+export const deletePayment = async (id) => {
+    const deletedPayment = await prisma.payment.delete({
+        where: {
+            id: parseInt(id)
+        },
+    })
+
+    return deletedPayment
 }
 
 export const deleteProgram = async (id) => {
@@ -365,6 +398,9 @@ export const fetchSettings = async () => {
         where: {
             id: 1,
         },
+        include: {
+            testimonials: true,
+        }
     })
     return settings
 }

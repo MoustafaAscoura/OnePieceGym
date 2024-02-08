@@ -1,15 +1,48 @@
-section div.slider {
+/* section div.slider {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
 section div.slider::-webkit-scrollbar {
   display: none;
+} */
+
+@media only screen and (max-width: 1024px) {
+  section div.slider::-webkit-scrollbar {
+    display: none;
+  }
+  section div.slider {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* width */
+section div.slider::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+section div.slider::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 10px;
+}
+
+/* Handle */
+section div.slider::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 50px;
+  margin: 10px;
+}
+
+/* Handle on hover */
+section div.slider::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 section div.slider > div {
-    position: relative;
-  }
+  position: relative;
+}
 
 section div.slider > div h4.caption {
     position: absolute;

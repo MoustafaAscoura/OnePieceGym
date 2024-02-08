@@ -89,6 +89,18 @@ model Payment {
 }
 
 model Settings {
-  id        Int       @id @default(autoincrement())
-  video     String?
+  id            Int       @id @default(autoincrement())
+  video         String?
+  testimonials  Testimonial[]
+  images        String[]
+}
+
+model Testimonial {
+  id  Int @id @default(autoincrement())
+  body      String
+  person    String
+  position  String
+  image     String?
+  settingsID   Int? @default(1)
+  settings     Settings? @relation(fields: [settingsID], references: [id])
 }

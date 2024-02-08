@@ -1,4 +1,4 @@
-import { addPayment, fetchPayments } from "@/app/lib/data"
+import { addPayment, fetchPayments, deletePayment } from "@/app/lib/data"
 
 export async function GET(request) {
   const res = await fetchPayments()
@@ -17,4 +17,10 @@ export async function POST(request) {
 
   const id = await addPayment(jsonData)
   return Response.json(id)
+}
+
+export async function DELETE(request) {
+  const id = request.nextUrl.searchParams.get("id")
+  const res = deletePayment(parseInt(id))
+  return Response.json(res)
 }

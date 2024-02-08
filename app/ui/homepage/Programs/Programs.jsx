@@ -6,7 +6,7 @@ export default function Programs () {
             <h3 className='section-header flex justify-center items-center text-2xl my-5'><span className='border-2 border-green-600 me-4 w-24'></span>What We Do</h3>
             <h1 className='font-bold text-2xl lg:text-5xl'>OUR <span className='text-green-600'>PROGRAMS</span></h1>
             
-            <div className="w-full flex flex-row overflow-x-scroll slider mt-8">
+            <div className="w-full flex flex-row overflow-x-auto slider mt-8">
                 <div className='flex-shrink-0'>
                     <img src='/assets/images/Program1.jpg' alt="Martial Arts" />
                     <h4 className='w-full caption'>Martial Arts Training</h4>

@@ -5,6 +5,7 @@ import paymentsSlice from './slices/paymentsSlice'
 import sessionsSlice from './slices/sessionsSlice'
 import programsSlice from './slices/programsSlice'
 import messagesSlice from './slices/messagesSlice'
+import settingsSlice from './slices/settingsSlice'
 
 export default configureStore({
     reducer:{
@@ -14,5 +15,6 @@ export default configureStore({
         sessionsList: sessionsSlice,
         programsList: programsSlice,
         messagesList: messagesSlice,
+        settingsList: settingsSlice,
     }
 })

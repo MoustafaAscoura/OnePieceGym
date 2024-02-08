@@ -1,12 +1,14 @@
 'use client'
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {Box, Paper, LinearProgress, Table, TableBody, 
-    TableCell, TableContainer, TableHead, TablePagination, TableRow} from '@mui/material';
+import {Box, Paper, LinearProgress, Table, TableBody, Button,
+    TableCell, TableContainer, TableHead, TablePagination, TableRow,
+    TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
 
 import MuiAlert from '@mui/material/Alert';
 import SearchBar from "@/app/ui/dashboard/trainees/searchBar"
-import { setErrorStatus, setPaymentsList, setPaymentsSum } from "@/app/lib/store/slices/paymentsSlice";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { removePayment, setErrorStatus, setPaymentsList, setPaymentsSum } from "@/app/lib/store/slices/paymentsSlice";
 
 const columns = [
   { id: 'id', label: 'ID', minWidth: 60},
@@ -20,14 +22,13 @@ export default function Payments () {
     const [query, setQuery] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [filteredData, setFilteredData] = useState([]);
-    const {paymentsList, status, sum} = useSelector(state => state.paymentsList)
+    const {paymentsList, status} = useSelector(state => state.paymentsList)
+    const [openDelete, setOpenDelete] = useState(false);
 
+    const handleClickOpen = (id) => setOpenDelete(id)
+    const handleClose = () => setOpenDelete(false)
+    const handleChangePage = (event, newPage) => setPage(newPage)
     const dispatch = useDispatch()
-
-    const handleChangePage = (event, newPage) => {
-      setPage(newPage);
-    };
-  
     const handleChangeRowsPerPage = (event) => {
       setRowsPerPage(+event.target.value);
       setPage(0);
@@ -50,20 +51,18 @@ export default function Payments () {
             dispatch(setErrorStatus())
         })
     }
-    
-    function calcPayments () {
-        fetch(`/api/payments/latest`)
+
+        
+    const deletePayment = (id) =>{
+        fetch(`/api/payments?id=${id}`, {method:"DELETE"})
         .then((response)=>{
             if (response.ok) {
                 return response.json();
             }
             throw new Error('Something went wrong');
         })
-        .then((responseJson) => {
-            dispatch(setPaymentsSum(responseJson._sum.amount))
-        }).catch((e)=>{
-            console.log(e)
-        })
+        .then(() => dispatch(removePayment(id)))
+        .catch((e)=> console.log(e))
     }
 
     useEffect(()=>{
@@ -96,6 +95,7 @@ export default function Payments () {
                                 
                             </TableCell>
                             ))}
+                            <TableCell align='center' style={{ minWidth: 20 }}>Delete</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -110,11 +110,12 @@ export default function Payments () {
                                 </TableCell>
                                 );
                             })}
+                            <TableCell align='center'> <DeleteIcon color="error" onClick={() => handleClickOpen(payment.id)}/> </TableCell>
                             </TableRow>
                         );
-                        }): status === 2 ? <TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="info">No Data Found</MuiAlert></TableCell></TableRow>
-                        :status === -1 ? <TableRow ><TableCell colSpan={8}><MuiAlert elevation={6} variant="filled" severity="error">An Error Happened!</MuiAlert></TableCell></TableRow>
-                        :<TableRow ><TableCell colSpan={8}><LinearProgress/></TableCell></TableRow>}
+                        }): status === 2 ? <TableRow ><TableCell colSpan={9}><MuiAlert elevation={6} variant="filled" severity="info">No Data Found</MuiAlert></TableCell></TableRow>
+                        :status === -1 ? <TableRow ><TableCell colSpan={9}><MuiAlert elevation={6} variant="filled" severity="error">An Error Happened!</MuiAlert></TableCell></TableRow>
+                        :<TableRow ><TableCell colSpan={9}><LinearProgress/></TableCell></TableRow>}
                     </TableBody>
                 </Table>
                 </TableContainer>
@@ -130,6 +131,52 @@ export default function Payments () {
                     showLastButton={true}
                 />
             </Paper>
+            <Dialog
+                open={openDelete}
+                onClose={handleClose}
+                PaperProps={{
+                component: 'form',
+                onSubmit: (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(event.currentTarget);
+                    const formJson = Object.fromEntries(formData.entries());
+                    const pass = formJson.password;
+                    if (pass == "3580") {
+                        deletePayment(openDelete)
+                    }
+                    handleClose();
+                },
+                }}
+            >
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                <DialogContentText>
+                    Enter Admin Password To Continue.
+                </DialogContentText>
+                <TextField
+                    autoFocus
+                    required
+                    margin="dense"
+                    id="password"
+                    name="password"
+                    label="Password"
+                    type="password"
+                    fullWidth
+                    variant="standard"
+                />
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button type="submit" color="error">Delete</Button>
+                </DialogActions>
+            </Dialog>
+            
         </Box>
     );
 }
+
+
+
+
+
+

@@ -30,6 +30,10 @@ const paymentsSlice = createSlice({
             state.status = 1
         },
 
+        removePayment: (state, action) => {
+            state.paymentsList = state.paymentsList.filter(pay => pay.id != action.payload)
+        },
+
         setErrorStatus: (state) => {
             state.status = -1
             state.sum = false
@@ -37,5 +41,5 @@ const paymentsSlice = createSlice({
     }
 })
 
-export const {setPaymentsList, addToPaymentsList, setErrorStatus, setPaymentsSum} = paymentsSlice.actions
+export const {setPaymentsList, addToPaymentsList, setErrorStatus, setPaymentsSum, removePayment} = paymentsSlice.actions
 export default paymentsSlice.reducer;

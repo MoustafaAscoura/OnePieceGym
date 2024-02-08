@@ -1,1 +1,4 @@
-Settings page in dashboard (testemonials)
+Handle private sessions count and payments
+Add images album in front and control them
+SEO
+fix video section responsive
