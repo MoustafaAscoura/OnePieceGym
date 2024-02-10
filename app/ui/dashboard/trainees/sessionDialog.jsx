@@ -1,5 +1,5 @@
 import {Dialog, DialogContent, DialogContentText, DialogTitle,
-    MenuItem, FormControl, Select} from '@mui/material';
+    MenuItem, FormControl, Select, FormControlLabel, Checkbox} from '@mui/material';
 import StarRating from './startRating';
 
 export default function SessionDialog({open, setOpen, addSession}) {
@@ -69,9 +69,14 @@ export default function SessionDialog({open, setOpen, addSession}) {
                                 {addSession ? <input id="duration" name="duration" type="number" min={0} step={0.5} max={5} defaultValue={1} required className="mt-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
                                 :<p>{open.duration}</p>}
                             </div>
+
                             <div className='flex flex-wrap'>
                                 <label for="rating" className="w-44 text-md font-medium leading-6 text-gray-900">Feedback</label>
                                 <StarRating name="rating" id="rating" showvalue={open.rating}/>
+                            </div>
+
+                            <div className="flex justify-center">
+                                <FormControlLabel disabled={!addSession} control={<Checkbox name="private" defaultChecked={open?.private} />} label="The session is private" />
                             </div>
                             { addSession ? <div>
                                 <button type="submit" className="flex w-full justify-center rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">Add Session</button>

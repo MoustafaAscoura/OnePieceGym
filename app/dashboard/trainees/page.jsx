@@ -57,11 +57,11 @@ export default function Trainees () {
           throw new Error('Something went wrong');
       })
       .then((responseJson) => {
-          dispatch(setTraineesList(responseJson.map(trainee => {
-              return serialize_trainee(trainee)
-          })))
+          dispatch(setTraineesList(responseJson.map(trainee => serialize_trainee(trainee)
+        )))
       }).catch((e)=>{
-          dispatch(setErrorStatus())
+            console.log(e)
+            dispatch(setErrorStatus())
       })
     }
 

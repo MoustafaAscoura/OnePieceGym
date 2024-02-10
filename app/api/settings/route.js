@@ -8,6 +8,7 @@ export async function GET(request) {
 export async function POST(request) {
   const formData = await request.formData()
   const jsonData = Object.fromEntries(formData);
+  jsonData.images = jsonData.images.split(',')
   const id = await editSettings(jsonData)
   return Response.json(id)
 }

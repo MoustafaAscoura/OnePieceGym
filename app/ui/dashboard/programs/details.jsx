@@ -203,6 +203,7 @@ export default function ProgramDetails({
                             fullWidth
                             size="small"
                           >
+                            <MenuItem value="session">Session</MenuItem>
                             <MenuItem value="week">Week</MenuItem>
                             <MenuItem value="month">Month</MenuItem>
                             <MenuItem value="year">Year</MenuItem>
@@ -269,17 +270,18 @@ export default function ProgramDetails({
                         Program Type </Typography>
                         {mode == "show"?<>
                         <Typography variant="h5" gutterBottom>
-                        {detailProgram.basic ? "Basic Program" : "Special Program"}
+                        {detailProgram.type} Program
                         </Typography></>:
                         <div>
                           <Select
-                            defaultValue={detailProgram.basic}
-                            name="basic"
+                            defaultValue={detailProgram.type}
+                            name="type"
                             fullWidth
                             size="small"
                           >
-                            <MenuItem value={true}>Basic</MenuItem>
-                            <MenuItem value={false}>Special</MenuItem>
+                            <MenuItem value="Basic">Basic</MenuItem>
+                            <MenuItem value="Special">Special</MenuItem>
+                            <MenuItem value="Private">Private</MenuItem>
                           </Select>
                         </div>}
                     </Grid>

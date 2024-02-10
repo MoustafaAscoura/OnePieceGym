@@ -6,25 +6,17 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 export default function Plans () {
     const [type, setType] = useState("basic")
-    const handleChange = (event, newType) => setType(newType || type);
+    const handleChange = (event, newType) => setType(newType);
     const [programs, setPrograms] = useState([])
 
     useEffect(()=>{
-        // $(".slider-child").draggable({ 
-        //     axis: "x",
-        //     revert: true
-        // });
-
         fetch(`/api/programs`)
         .then((response)=>{
             if (response.ok) return response.json();
             throw new Error('Something went wrong');
         })
         .then((responseJson) => {
-            setPrograms(responseJson.map(program => {
-                program.trainees_count = program._count.trainees || 0
-                return program
-            }))
+            setPrograms(responseJson)
         }).catch((e)=> console.log(e))
     },[])
 
@@ -45,37 +37,39 @@ export default function Plans () {
                   size="large"
                 >
                   <ToggleButton className='rounded-lg' sx={{color: 'grey'}} value="basic">Basic Plans</ToggleButton>
-                  <ToggleButton className='rounded-lg' sx={{color: 'grey'}} value="other">Other Plans</ToggleButton>
+                  <ToggleButton className='rounded-lg' sx={{color: 'grey'}} value="special">Special Plans</ToggleButton>
+                  <ToggleButton className='rounded-lg' sx={{color: 'grey'}} value="private">Private Plans</ToggleButton>
                 </ToggleButtonGroup>
             </div>
             <div className="mt-8 overflow-x-auto slider cursor-grab">
                 <div className="w-full flex flex-row gap-4 slider-child">
                 {programs.filter(plan => {
-                    return (plan.show && ((plan.basic && type=="basic")||(!plan.basic && type=="other")))
+                    return (plan.show && (plan.type.toLowerCase() == type))
                 }).map(plan => {
                     return <>
                         {/* Pricing Card */}
-                        <div className={`${plan.badge? 'relative' : ''} plan overflow-hidden flex-shrink-0 flex flex-col p-6 mx-auto w-80 text-center rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-4 dark:bg-gray-800 dark:text-white`}>
+                        <div className={`${plan.badge? 'relative' : ''} plan min-h-64 overflow-hidden flex-shrink-0 flex flex-col p-6 mx-auto w-80 text-center rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-4 dark:bg-gray-800 dark:text-white`}>
                             {plan.badge.length? <p className={`absolute ${ plan.badge == "Top-seller" ? 'bg-green-500' : 'bg-yellow-500'} -rotate-45 px-16 -left-16 top-8`}>{plan.badge}</p> : <></>}
                             
                             <h3 className="mb-4 text-2xl font-semibold">{plan.name}</h3>
-                            <p className="font-light text-gray-500 sm:text-lg dark:text-gray-400 mt-5 min-h-24">{plan.description}</p>
+                            {plan.description ? <p className="font-light text-gray-500 sm:text-lg dark:text-gray-400 mt-5 min-h-24">{plan.description}</p>:<></>}
                             <div className="flex justify-center items-baseline my-4">
                                 <span className="mr-2 text-5xl font-extrabold ">£ {plan.cost}</span>
                                 <span className="text-gray-500 dark:text-gray-400">/{plan.duration} {plan.period}</span>
                             </div>
                             {/* List */}
+                            {plan.type.toLowerCase() !== "private" ? 
                             <ul role="list" className="mb-8 space-y-4 text-left">
                                 {plan.features.map(feature => {
                                     return <>
                                         <li className="flex items-center space-x-3">
                                             {/* Icon */}
-                                            <svg className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                            <svg className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
                                             <span>{feature}</span>
                                         </li>
                                     </>
                                 })}
-                            </ul>
+                            </ul>:<></>}
                             <a href="#contact" className="mt-auto text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white  dark:focus:ring-green-900">Get started</a>
                         </div>
                     </>

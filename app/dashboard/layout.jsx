@@ -117,7 +117,7 @@ export default function Layout({ children }) {
 
   const handleDrawerClose = () => setOpen(false);
 
-  useEffect(() => {if (getCookie('coach') != '123') router.push('/')}, [])
+  useEffect(() => {if (getCookie('coach') != process.env.ADMIN_PASSWORD) router.push('/')}, [])
 
   return (
 

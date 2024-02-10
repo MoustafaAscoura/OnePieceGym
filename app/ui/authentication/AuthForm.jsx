@@ -20,7 +20,7 @@ export default function AuthForm({open, setOpen, setUser}) {
             setStatus(2)
             setTimeout(()=>setStatus(0),3000)
             if (userData.coach) {
-                setCookie('coach',"123")
+                setCookie('coach',process.env.ADMIN_PASSWORD, {maxAge: 21600})
                 router.push('/dashboard')
             } else {
                 setUser(userData)

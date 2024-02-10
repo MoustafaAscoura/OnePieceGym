@@ -15,19 +15,26 @@ model Trainee {
   fname     String
   mname     String?
   lname     String
-  img       String?
-  email     String?   @unique
+  email     String?
   phone     String   @unique @db.VarChar(15)
-  active    Boolean @default (true)
-  coach     Coach ? @relation(fields: [coachID], references: [id])
-  coachID   Int ?
+  birthdate DateTime?
+  coach     Coach? @relation(fields: [coachID], references: [id])
+  coachID   Int?
   sessions  Session[]
   payments  Payment[]
-  program   Program @relation(fields: [programID], references: [id])
-  programID Int
+
+  program   Program? @relation("program", fields: [programID], references: [id])
+  programID Int?
+  special   Program? @relation("special", fields: [specialID], references: [id])
+  specialID Int?
+  private   Program? @relation("private", fields: [privateID], references: [id])
+  privateID Int?
+  
+  basic_start DateTime @default(now())
+  special_start DateTime @default(now())
+  private_start DateTime @default(now())
+
   createdAt DateTime  @default(now())
-  subscription_start DateTime @default(now())
-  birthdate DateTime
 }
 
 model Coach {
@@ -55,6 +62,7 @@ model Session {
   traineeID   Int ?
   description String ?
   rating      Float?  @default(5)
+  private     Boolean?  @default(false)
 }
 
 model Program {
@@ -64,11 +72,13 @@ model Program {
   period    String
   duration  Int @default(1)
   description  String
-  trainees  Trainee[]
+  trainees  Trainee[] @relation("program")
   features  String[]
   badge     String?
-  basic     Boolean?  @default(true)
-  show     Boolean?  @default(true)
+  type     String     @default("basic")
+  show      Boolean?  @default(true)
+  private_trainees  Trainee[] @relation("private")
+  special_trainees  Trainee[] @relation("special")
 }
 
 model Message {

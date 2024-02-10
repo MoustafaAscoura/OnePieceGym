@@ -1,11 +1,6 @@
-/* section div.slider {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+section div.slider {
+  padding-bottom: 20px;
 }
-
-section div.slider::-webkit-scrollbar {
-  display: none;
-} */
 
 @media only screen and (max-width: 1024px) {
   section div.slider::-webkit-scrollbar {

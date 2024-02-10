@@ -35,6 +35,7 @@ import { addToPaymentsList } from "@/app/lib/store/slices/paymentsSlice";
 import { addToSessionsList } from "@/app/lib/store/slices/sessionsSlice";
 import { setCoachesList, setErrorStatus as setCoachesError } from "@/app/lib/store/slices/coachesSlice";
 import { setErrorStatus as setProgramsError, setProgramsList } from "@/app/lib/store/slices/programsSlice";
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -51,7 +52,7 @@ export default function TraineeDetails({
   const [error, setError] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false)
   const [sessionOpen, setSessionOpen] = useState(false)
-  const [mode, setMode] = useState("show"); //show, edit, or create
+  const [mode, setMode] = useState("show");
   const {coachesList, status: coachesStatus} = useSelector(state => state.coachesList)
   const {programsList, status: programsStatus} = useSelector(state => state.programsList)
   const dispatch = useDispatch()
@@ -69,24 +70,22 @@ export default function TraineeDetails({
         console.log(e)
         dispatch(setCoachesError())
     })
-}
+  }
 
-function fetchPrograms () {
-    fetch(`/api/programs`)
-    .then((response)=>{
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error('Something went wrong');
-    })
-    .then((responseJson) => {
-        dispatch(setProgramsList(responseJson))
-    }).catch((e)=>{
-        console.log(e)
-        dispatch(setProgramsError())
-
-    })
-}
+  function fetchPrograms () {
+      fetch(`/api/programs`)
+      .then((response)=>{
+          if (response.ok) {
+              return response.json();
+          }
+          throw new Error('Something went wrong');
+      })
+      .then((responseJson) => {
+          dispatch(setProgramsList(responseJson))
+      }).catch((e)=>{
+          dispatch(setProgramsError())
+      })
+  }
 
   const handleChange = (event) => {
     let val = event.target.value;
@@ -127,6 +126,14 @@ function fetchPrograms () {
     setFormErrors(formErrors_);
   };
 
+  const renewProgram = (name) => {
+    const formData = new FormData()
+    const today = new Date();
+    formData.set("id", detailTrainee.id);
+    formData.set(name, today.toISOString());
+    handleSubmit(formData);
+  }
+  
   const toggleEdit = (event) => {
     if (mode === "show") {
       setMode("edit");
@@ -135,12 +142,18 @@ function fetchPrograms () {
       const formData = new FormData(event.target.form);
       if (mode === "edit") {
         formData.set("id", detailTrainee.id);
+        const today = new Date();
+
         if (formData.get("programID") != detailTrainee.programID) {
-          const today = new Date();
-          formData.set("subscription_start", today.toISOString());
-        } else {
-          formData.set("subscription_start", detailTrainee.subscription_start);
+          formData.set("basic_start", today.toISOString());
         }
+        if (formData.get("specialID") != detailTrainee.specialID) {
+          formData.set("special_start", today.toISOString());
+        }
+        if (formData.get("privateID") != detailTrainee.privateID) {
+          formData.set("private_start", today.toISOString());
+        }
+
       }
       handleSubmit(formData);
     }
@@ -166,7 +179,6 @@ function fetchPrograms () {
         setMode("show");
       })
       .catch((err) => {
-        console.log(err)
         if (err.name === "PrismaClientKnownRequestError") {
           setError("Invalid Relative Field - Coach or Program incorrect");
         } else {
@@ -422,10 +434,10 @@ function fetchPrograms () {
                         <Divider/></>}
 
                     </Grid>
-                    {mode=="show"?<><Grid item container direction="row" >
+                    {mode=="show"?<><Grid item container gap={3} direction="row" >
                         <div className='me-20'>
                             <Typography gutterBottom variant="subtitle1" color="text.secondary">
-                                Program
+                                Basic Program
                             </Typography>
                             <Typography variant="h5" gutterBottom>
                             {detailTrainee.program?.name}
@@ -438,6 +450,11 @@ function fetchPrograms () {
                             <Typography variant="h5" gutterBottom>
                             {detailTrainee.membership_expiry}
                             </Typography>
+                        </div>
+                        <div className="my-auto">
+                          <Button onClick={() => renewProgram('basic_start')} variant="outlined" startIcon={<AutorenewIcon />}>
+                            Renew
+                          </Button>
                         </div>
                     </Grid><Divider/></>:
                     <Grid item container direction="column" >
@@ -453,7 +470,91 @@ function fetchPrograms () {
                           required
                         >
                           {programsList.map(prog => {
-                            return <MenuItem key={prog.id} value={prog.id}>{prog.name} - {prog.duration} {prog.period}</MenuItem>
+                            return prog.type.toLowerCase() == "basic" ? <MenuItem key={prog.id} value={prog.id}>{prog.name} - {prog.duration} {prog.period}</MenuItem>:<></>
+                          })}
+                        </Select>
+                        <Divider/>
+                    </Grid>}
+
+                    {mode=="show"?<><Grid item container gap={3} direction="row" >
+                        <div className='me-20'>
+                            <Typography gutterBottom variant="subtitle1" color="text.secondary">
+                                Special Program
+                            </Typography>
+                            <Typography variant="h5" gutterBottom>
+                            {detailTrainee.special?.name}
+                            </Typography>
+                        </div>
+                        <div>
+                            <Typography gutterBottom variant="subtitle1" color="text.secondary">
+                            Expiry Date
+                            </Typography>
+                            <Typography variant="h5" gutterBottom>
+                            {detailTrainee.special_membership_expiry}
+                            </Typography>
+                        </div>
+                        <div className="my-auto">
+                          <Button onClick={() => renewProgram('special_start')} variant="outlined" startIcon={<AutorenewIcon />}>
+                            Renew
+                          </Button>
+                        </div>
+                    </Grid><Divider/></>:
+                    <Grid item container direction="column" >
+                        <Typography gutterBottom variant="subtitle1" color="text.secondary">
+                            Special Program ID
+                        </Typography>
+                        <Select
+                          defaultValue={detailTrainee?.specialID}
+                          name="specialID"
+                          fullWidth
+                          size="small"
+                          sx={{mb:2, mt:0}}
+                          required
+                        >
+                          {programsList.map(prog => {
+                            return prog.type.toLowerCase() == "special" ? <MenuItem key={prog.id} value={prog.id}>{prog.name} - {prog.duration} {prog.period}</MenuItem>:<></>
+                          })}
+                        </Select>
+                        <Divider/>
+                    </Grid>}
+
+                    {mode=="show"?<><Grid item container direction="row" >
+                        <div className='me-5'>
+                            <Typography gutterBottom variant="subtitle1" color="text.secondary">
+                                Private Program
+                            </Typography>
+                            <Typography variant="h5" gutterBottom sx={{maxWidth: 220}}>
+                            {detailTrainee.private?.name}
+                            </Typography>
+                        </div>
+                        <div>
+                            <Typography gutterBottom variant="subtitle1" color="text.secondary">
+                            Remaining Sessions
+                            </Typography>
+                            <Typography variant="h5" gutterBottom>
+                            {detailTrainee.private_sessions}
+                            </Typography>
+                        </div>
+                        <div className="my-auto">
+                          <Button onClick={() => renewProgram('private_start')} variant="outlined" startIcon={<AutorenewIcon />}>
+                            Renew
+                          </Button>
+                        </div>
+                    </Grid><Divider/></>:
+                    <Grid item container direction="column" >
+                        <Typography gutterBottom variant="subtitle1" color="text.secondary">
+                            Private Program ID
+                        </Typography>
+                        <Select
+                          defaultValue={detailTrainee?.privateID}
+                          name="privateID"
+                          fullWidth
+                          size="small"
+                          sx={{mb:2, mt:0}}
+                          required
+                        >
+                          {programsList.map(prog => {
+                            return prog.type.toLowerCase() == "private" ? <MenuItem key={prog.id} value={prog.id}>{prog.name} - {prog.duration} {prog.period}</MenuItem>:<></>
                           })}
                         </Select>
                         <Divider/>
@@ -462,7 +563,7 @@ function fetchPrograms () {
                         </Typography>
                         <input id="birthdate" name="birthdate" type="date" defaultValue={detailTrainee.birthdate?.toISOString().split('T')[0]} required className="mt-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
                         <Divider/>
-                        </Grid>}
+                    </Grid>}
 
                     {mode === "create"?<></>:<>
                       <Grid item container direction="row" sx={{pl:0}} >
@@ -489,7 +590,7 @@ function fetchPrograms () {
                               Due Payment    
                           </Typography>
                           <Typography variant="h5" gutterBottom>
-                              Paid {detailTrainee.payment_total} out of {detailTrainee.program?.cost}
+                              Paid {detailTrainee.payment_now} out of {detailTrainee.payment_total}
                           </Typography>
                       </Grid>
                     </>}

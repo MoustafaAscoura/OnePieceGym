@@ -13,6 +13,7 @@ export async function POST(request) {
   jsonData.coachID = parseInt(jsonData.coachID)
   jsonData.rating =  parseFloat(jsonData.rating) || 5
   jsonData.duration = parseFloat(jsonData.duration) || 1
+  jsonData.private = jsonData.private === "on"
   
   delete jsonData.hour
 

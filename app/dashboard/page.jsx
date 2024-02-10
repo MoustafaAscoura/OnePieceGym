@@ -57,7 +57,12 @@ export default function Dashboard() {
         throw new Error('Something went wrong');
     })
     .then((responseJson) => {
-        dispatch(setProgramsList(responseJson))
+      dispatch(setProgramsList(responseJson.map(program => {
+          program.trainees_count = program.type.toLowerCase() == "basic"? program._count.trainees
+          : program.type.toLowerCase() == "special" ? program._count.special_trainees
+          : program._count.private_trainees
+          return program
+      })))
     }).catch((e)=>{
       console.log(e)
       dispatch(setProgramsError())

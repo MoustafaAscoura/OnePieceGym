@@ -1,4 +1,3 @@
-Handle private sessions count and payments
-Add images album in front and control them
+Add images album in front
 SEO
 fix video section responsive

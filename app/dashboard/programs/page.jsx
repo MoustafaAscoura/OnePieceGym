@@ -17,7 +17,7 @@ const columns = [
   { id: 'period', label: 'Period', minWidth: 40},
   { id: 'trainees_count', label: 'Trainees', minWidth:30},
   { id: 'show', label: 'Show on Website', minWidth:40},
-  { id: 'basic', label: 'Program Type', minWidth:40},
+  { id: 'type', label: 'Program Type', minWidth:40},
 ];
 
 export default function Programs () {
@@ -50,7 +50,9 @@ export default function Programs () {
         })
         .then((responseJson) => {
             dispatch(setProgramsList(responseJson.map(program => {
-                program.trainees_count = program._count.trainees || 0
+                program.trainees_count = program.type.toLowerCase() == "basic"? program._count.trainees
+                : program.type.toLowerCase() == "special" ? program._count.special_trainees
+                : program._count.private_trainees
                 return program
             })))
         }).catch((e)=>{
@@ -99,7 +101,7 @@ export default function Programs () {
                                 return (
                                 <TableCell key={column.id} align='center'>
                                     {column.id === "show"? value? "Shown" : "Hidden" 
-                                    : column.id === "basic" ? value ? "Basic Program" : "Special Program" : value}
+                                    : column.id === "_count" ? value.trainees : value}
                                 </TableCell>    
                                 );
                             })}
