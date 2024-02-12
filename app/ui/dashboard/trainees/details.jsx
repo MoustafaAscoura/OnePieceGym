@@ -313,51 +313,29 @@ export default function TraineeDetails({
           <Paper sx={{ p: 2, margin: 'auto', flexGrow: 1, backgroundColor: (theme) =>
                   theme.palette.mode === 'dark' ? '#1A2027' : '#fff',}}>
 
-              <Grid container spacing={2} component='form' onChange={e => handleChange(e)} onSubmit={e => handleSubmit(e)}>
-                <Grid item xs={12} sm={12} md={4} spacing={2} className='flex flex-col items-center py-5'>
-                    <Avatar
-                    alt="Remy Sharp"
-                    src={detailTrainee.img||"/assets/images/trainee_annon.jpg"}
-                    sx={{ width: 160, height: 160, marginBottom:4}}
-                    />
-
-                    {mode === "create" ? 
-                    <Button variant="outlined" onClick={e => toggleEdit(e)} 
-                    startIcon={loading?<></>:<EditIcon />}>
-                        {loading? <CircularProgress sx={{mr:2}} size={20}/>:<></>}{loading?"Saving...":"Save"}
-                    </Button>
-                    : <>
-                    <Chip sx={{marginBottom:5}} color={detailTrainee.status == "Valid Membership"?"success":detailTrainee.status == "Payment Due"?"warning":"error"} size="small" label={detailTrainee.status}/>
-
-                    <Stack spacing={1} justifyContent="center"  alignItems="center" direction="row" useFlexGap flexWrap="wrap" className='w-full max-w-80'>
-                        <Button variant="outlined" onClick={e => toggleEdit(e)} 
-                        startIcon={loading?<></>:<EditIcon />} sx={{ flexGrow: 1 }}>
-                            {loading? <CircularProgress sx={{mr:2}} size={20}/>:<></>}{mode=="edit"?loading?"Saving...":"Save":"Edit"}
-                        </Button>
-                        <Button variant="outlined" color="error" onClick={e => {setOpenDelete(true)}} startIcon={<DeleteIcon />}>
-                            Delete
-                        </Button>
-                    </Stack>
-                    <Button variant="outlined" onClick={e => setPaymentOpen(true)} component='div' color="success" startIcon={<AttachMoneyIcon />} className='w-full max-w-96 my-6'>
-                        Add Payment
-                    </Button>
-                    <Button variant="outlined" onClick={e => setSessionOpen(true)} component='div' color="success" startIcon={<TimerIcon />} className='w-full max-w-96'>
-                        Add Session
-                    </Button>
-                    </>}
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={8} >
+                <Grid container spacing={2} component='form' onChange={e => handleChange(e)} onSubmit={e => handleSubmit(e)} >
                   <Grid item xs container direction="column" spacing={2} className='ps-3' >
+                  <Grid item container direction="row" spacing={2} alignItems="center">
+                        {mode === "create"?<></>:<>
+                        <Grid item>
+                            <Typography gutterBottom variant="subtitle1" color="text.secondary">
+                              Status
+                            </Typography>
+                            <Chip color={detailTrainee.status == "Valid Membership"?"success":detailTrainee.status == "Payment Due"?"warning":"error"} size="small" label={detailTrainee.status}/>
+                        </Grid>
+                        </>}
+                    </Grid>
                     <Grid item container direction="row" spacing={2} alignItems="center">
-                        {mode === "create"?<></>:<><Grid item xs={2}>
+                        {mode === "create"?<></>:<>
+                        <Grid item xs={2}>
                             <Typography gutterBottom variant="subtitle1" color="text.secondary">
                                 ID
                             </Typography>
                             <Typography variant="h5" gutterBottom>
                             {detailTrainee.id}
                             </Typography>
-                        </Grid></>}
+                        </Grid>
+                        </>}
                         <Grid item xs={10}  >
                             <Typography gutterBottom variant="subtitle1" color="text.secondary">
                             Name </Typography>
@@ -451,7 +429,7 @@ export default function TraineeDetails({
                             {detailTrainee.membership_expiry}
                             </Typography>
                         </div>
-                        <div className="my-auto">
+                        <div className="my-auto ms-auto">
                           <Button onClick={() => renewProgram('basic_start')} variant="outlined" startIcon={<AutorenewIcon />}>
                             Renew
                           </Button>
@@ -493,7 +471,7 @@ export default function TraineeDetails({
                             {detailTrainee.special_membership_expiry}
                             </Typography>
                         </div>
-                        <div className="my-auto">
+                        <div className="my-auto ms-auto">
                           <Button onClick={() => renewProgram('special_start')} variant="outlined" startIcon={<AutorenewIcon />}>
                             Renew
                           </Button>
@@ -535,7 +513,7 @@ export default function TraineeDetails({
                             {detailTrainee.private_sessions}
                             </Typography>
                         </div>
-                        <div className="my-auto">
+                        <div className="my-auto ms-auto">
                           <Button onClick={() => renewProgram('private_start')} variant="outlined" startIcon={<AutorenewIcon />}>
                             Renew
                           </Button>
@@ -596,8 +574,6 @@ export default function TraineeDetails({
                     </>}
                   </Grid>
                 </Grid>
-              </Grid>
-
               {mode === "create" ? <></>:<>
                 <Dialog open={openDelete}
                   onClose={e => setOpenDelete(false)}
@@ -634,7 +610,27 @@ export default function TraineeDetails({
           :<></>}
         </DialogContentText>
       </DialogContent>
-      <DialogActions>
+      <DialogActions className="gap-2 flex-col	md:flex-row" sx={{paddingBlock: 2, display: 'flex', justifyContent: 'space-between'}}>
+      {mode === "create" ? 
+          <Button variant="outlined" onClick={e => toggleEdit(e)} 
+          startIcon={loading?<></>:<EditIcon />}>
+              {loading? <CircularProgress sx={{mr:2}} size={20}/>:<></>}{loading?"Saving...":"Save"}
+          </Button>
+          : <>
+          <Button variant="outlined" onClick={e => toggleEdit(e)} 
+            startIcon={loading?<></>:<EditIcon />} sx={{ flexGrow: 1 }}>
+                {loading? <CircularProgress sx={{mr:2}} size={20}/>:<></>}{mode=="edit"?loading?"Saving...":"Save":"Edit"}
+          </Button>
+          <Button variant="outlined" color="error" onClick={e => {setOpenDelete(true)}} startIcon={<DeleteIcon />}>
+              Delete
+          </Button>
+          <Button variant="outlined" onClick={e => setPaymentOpen(true)} component='div' color="success" startIcon={<AttachMoneyIcon />} >
+              Add Payment
+          </Button>
+          <Button variant="outlined" onClick={e => setSessionOpen(true)} component='div' color="success" startIcon={<TimerIcon />}>
+              Add Session
+          </Button>
+        </>}
         <Button color="success" onClick={(e) => setDetailTrainee(false)}>
           Close
         </Button>

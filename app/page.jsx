@@ -19,8 +19,8 @@ export default function Homepage () {
     return <>
         <Navbar/>
         <Hero/>
-        <Video/>
         <Services/>
+        <Video/>
         <Programs/>
         <Coaches/>
         <Plans/>

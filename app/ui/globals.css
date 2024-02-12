@@ -23,3 +23,10 @@ a {
   margin: 0;
   padding: 0;
 }
+
+@media screen and (max-width: 768px) {
+    div.fb-video > span {
+        max-height: 55vmin
+    }
+}
+

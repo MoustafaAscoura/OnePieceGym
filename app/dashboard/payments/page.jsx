@@ -141,7 +141,7 @@ export default function Payments () {
                     const formData = new FormData(event.currentTarget);
                     const formJson = Object.fromEntries(formData.entries());
                     const pass = formJson.password;
-                    if (pass == "3580") {
+                    if (pass == process.env.ADMIN_PASSWORD) {
                         deletePayment(openDelete)
                     }
                     handleClose();

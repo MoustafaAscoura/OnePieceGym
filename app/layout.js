@@ -6,7 +6,8 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'Onepiece Gym',
-  description: 'GYM Homepage and Management System',
+  description: 'OnePiece GYM Homepage and Management System',
+  keywords: 'GYM, Fitness, Health, Lifestyle, Onepiece, Wellbeing'
 }
 
 export default function RootLayout({ children }) {
@@ -17,10 +18,6 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#000000" />
-        <meta
-          name="description"
-          content="Web site created using create-react-app"
-        />
         <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
