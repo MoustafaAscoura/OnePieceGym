@@ -301,6 +301,9 @@ export default function TraineeDetails({
       aria-describedby="scroll-dialog-description"
       fullWidth={true}
       maxWidth="md"
+      component='form' 
+      onChange={e => handleChange(e)} 
+      onSubmit={e => handleSubmit(e)}
     >
       <DialogTitle id="scroll-dialog-title">Details</DialogTitle>
       <DialogContent dividers={true}>
@@ -313,7 +316,7 @@ export default function TraineeDetails({
           <Paper sx={{ p: 2, margin: 'auto', flexGrow: 1, backgroundColor: (theme) =>
                   theme.palette.mode === 'dark' ? '#1A2027' : '#fff',}}>
 
-                <Grid container spacing={2} component='form' onChange={e => handleChange(e)} onSubmit={e => handleSubmit(e)} >
+                <Grid container spacing={2} >
                   <Grid item xs container direction="column" spacing={2} className='ps-3' >
                   <Grid item container direction="row" spacing={2} alignItems="center">
                         {mode === "create"?<></>:<>
