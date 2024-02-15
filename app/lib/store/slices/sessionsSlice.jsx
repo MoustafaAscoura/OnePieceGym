@@ -27,7 +27,7 @@ const sessionsSlice = createSlice({
 
         setSessionsCount: (state, action) => {
             state.count = action.payload
-            state.status = 1
+            if (state.status < 1) state.status = 1
         },
 
         removeSession: (state, action) => {
