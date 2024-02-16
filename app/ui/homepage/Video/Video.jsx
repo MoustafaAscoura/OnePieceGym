@@ -16,12 +16,12 @@ function StandardImageList({imagesData}) {
 
   return (
     <div className="relative">
-        <div class="p-8 lg:p-32 lg:py-10">
-            <div className="relative">
+        <div class="p-8 lg:p-32 lg:py-10 flex justify-center">
+            <div className="relative max-w-screen-lg">
                 {imagesData.map((item, index) => (
-                    <div key={index} className={`${index == shownIndex ? '':'absolute opacity-0'} transition-all duration-500 ease-in-out`}>
+                    <div key={index} className={`${index == shownIndex ? '':'absolute opacity-0'} flex justify-center transition-all duration-500 ease-in-out `}>
                         <img src={item} alt={`onepiece gym ${index}`} 
-                        class='w-full rounded-lg'/>
+                        class='max-h-screen rounded-lg'/>
                     </div>
                 ))}
             </div>

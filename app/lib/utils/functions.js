@@ -120,7 +120,7 @@ const serialize_trainee = (trainee) => {
 
 const serialize_coach = (coach) => {
     coach.birthdate = new Date(coach.birthdate)
-    coach.name = coach.fname + (` ${coach.mname} ` || ' ') + coach.lname;
+    coach.name = coach.fname + coach.lname;
     coach.age = coach.birthdate ? calculate_age(coach.birthdate): '';
     coach.sessions_count = coach._count.sessions
     coach.trainees_count = coach._count.trainees

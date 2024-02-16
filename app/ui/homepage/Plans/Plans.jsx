@@ -48,7 +48,7 @@ export default function Plans () {
                 }).map(plan => {
                     return <>
                         {/* Pricing Card */}
-                        <div className={`${plan.badge? 'relative' : ''} plan min-h-64 overflow-hidden flex-shrink-0 flex flex-col p-6 mx-auto w-80 text-center rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-4 dark:bg-gray-800 dark:text-white`}>
+                        <div className={`${plan.badge? 'relative' : ''} plan min-h-64 overflow-hidden flex-shrink-0 flex flex-col p-6 mx-auto min-w-72 w-5/6 max-w-80 text-center rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-4 dark:bg-gray-800 dark:text-white`}>
                             {plan.badge.length? <p className={`absolute ${ plan.badge == "Top-seller" ? 'bg-green-500' : 'bg-yellow-500'} -rotate-45 px-16 -left-16 top-8`}>{plan.badge}</p> : <></>}
                             
                             <h3 className="mb-4 text-2xl font-semibold">{plan.name}</h3>

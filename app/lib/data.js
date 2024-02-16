@@ -174,6 +174,7 @@ export const createTrainee = async (data) => {
       })
 
     await AppendCache('trainees', newTrainee)
+    await kv.del('trainees:count')
     return newTrainee
 }
 
@@ -183,6 +184,7 @@ export const createMessage = async (data) => {
       })
 
     await AppendCache('messages', newMessage)
+    await kv.del('messages:unread')
     return newMessage
 }
 
@@ -215,6 +217,7 @@ export const addPayment = async (data) => {
     const newPayment = await prisma.payment.create({data: data})
     if (data.renew) await editTrainee({id: data.id, basic_start: data.createdAt})
     await AppendCache('payments', newPayment)
+    await kv.del('payments:latest')
     return newPayment
 }
 
@@ -239,6 +242,7 @@ export const addSession = async (data) => {
         },
       })
     await AppendCache('sessions', newSession, 'right')
+    kv.del('sessions:latest')
     return newSession
 }
 
@@ -289,6 +293,7 @@ export const deleteTrainee = async (id) => {
     })
 
     await RemoveCache('trainees', deletedTrainee)
+    await kv.del('trainees:count')
     return deletedTrainee
 } 
 
@@ -327,6 +332,7 @@ export const deleteMessage = async (id) => {
         },
     })
     await RemoveCache('messages', deletedMessage)
+    await kv.del('messages:unread')
     return deletedMessage
 }
 
@@ -353,6 +359,7 @@ export const deleteSession = async (id) => {
         },
     })
     await RemoveCache('sessions', deletedSession)
+    await kv.del('sessions:latest')
     return deletedSession
 }
 
@@ -469,10 +476,12 @@ export const editSettings = async (data) => {
 
 // Retrieving Data
 export const getTrainee = async (data) => {
-    const trainee = await prisma.trainee.findUnique({
-        where: data,
-      })
-      return trainee
+    return await RedisCache(`trainee:${data.id}`, async () => {
+        const trainee = await prisma.trainee.findUnique({
+            where: data,
+          })
+          return trainee
+    })
 }
 
 export const getCoach = async (data) => {
@@ -549,7 +558,7 @@ export const seeMessage = async (id) => {
             read: true
         },
     })
-    let old_count = await kv.get('messages:unread')
-    await kv.set('messages:unread', old_count? parseInt(old_count) -1 : 0, {ex:6*3600}) 
+    await kv.del('messages:unread')
+    await kv.del('messages')
     return seenMessage
 }
