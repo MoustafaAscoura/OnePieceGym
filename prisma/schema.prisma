@@ -22,6 +22,7 @@ model Trainee {
   coachID   Int?
   sessions  Session[]
   payments  Payment[]
+  notes     String?
 
   program   Program? @relation("program", fields: [programID], references: [id])
   programID Int?
@@ -92,9 +93,11 @@ model Message {
 
 model Payment {
   id          Int       @id @default(autoincrement())
-  trainee     Trainee @relation(fields: [traineeID], references: [id])
-  traineeID   Int
+  trainee     Trainee? @relation(fields: [traineeID], references: [id])
+  traineeID   Int?
   amount      Int
+  note        String?
+  expense     Boolean   @default(false)
   createdAt   DateTime  @default(now())
 }
 

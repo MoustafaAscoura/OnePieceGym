@@ -372,6 +372,21 @@ export default function TraineeDetails({
                         </Typography>
                         <TextField sx={{mb:2, mt:0}} error={formErrors.email} name="email" fullWidth
                         defaultValue={detailTrainee.email} variant="standard" margin="normal" helperText={formErrors.email || ""}/><Divider/></>}
+                        
+                        {mode==="show"? detailTrainee.notes?<>
+                        <Typography gutterBottom variant="subtitle1" color="text.secondary">
+                            Notes    
+                        </Typography>
+                        <Typography variant="h5" gutterBottom>
+                            {detailTrainee.notes}
+                        </Typography>
+                        <Divider/>
+                        </>:<></>:<>
+                        <Typography variant="subtitle1" color="text.secondary">
+                            Notes    
+                        </Typography>
+                        <TextField sx={{mb:2, mt:0}} name="notes" fullWidth multiline
+                        defaultValue={detailTrainee.notes} variant="standard" margin="normal"/><Divider/></>}
 
                         {mode==="show"? detailTrainee.phone?<>
                         <Typography gutterBottom variant="subtitle1" color="text.secondary">

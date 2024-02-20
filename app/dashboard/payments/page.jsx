@@ -8,7 +8,8 @@ import {Box, Paper, LinearProgress, Table, TableBody, Button,
 import MuiAlert from '@mui/material/Alert';
 import SearchBar from "@/app/ui/dashboard/trainees/searchBar"
 import DeleteIcon from '@mui/icons-material/Delete';
-import { removePayment, setErrorStatus, setPaymentsList, setPaymentsSum } from "@/app/lib/store/slices/paymentsSlice";
+import { removePayment, setErrorStatus, setPaymentsList, addToPaymentsList } from "@/app/lib/store/slices/paymentsSlice";
+import ExpensesDialog from "@/app/ui/dashboard/trainees/expensesDialog";
 
 const columns = [
   { id: 'id', label: 'ID', minWidth: 60},
@@ -24,6 +25,7 @@ export default function Payments () {
     const [filteredData, setFilteredData] = useState([]);
     const {paymentsList, status} = useSelector(state => state.paymentsList)
     const [openDelete, setOpenDelete] = useState(false);
+    const [expenseOpen, setExpenseOpen] = useState(false)
 
     const handleClickOpen = (id) => setOpenDelete(id)
     const handleClose = () => setOpenDelete(false)
@@ -65,6 +67,24 @@ export default function Payments () {
         .catch((e)=> console.log(e))
     }
 
+
+    const addExpense = (formData) => {
+
+        fetch("/api/payments", {
+            method: "POST",
+            body: formData,
+        }).then(response => response.json())
+            .then(jsonResponse => {
+                const createdAt = new Date()
+            dispatch(addToPaymentsList({...jsonResponse, 
+                createdAt:createdAt.toLocaleDateString('en-GB'),
+            }))
+            setExpenseOpen(false);
+            })
+            .catch((err) => {
+            console.log(err)});
+    }
+
     useEffect(()=>{
         if (status > 1) {
             setFilteredData(paymentsList.filter(payment => {
@@ -79,7 +99,7 @@ export default function Payments () {
 
     return (
         <Box className="bg-green-100">
-            <SearchBar query={query} setQuery={setQuery} createNew={false}/>
+            <SearchBar query={query} setQuery={setQuery} createNew={() => setExpenseOpen(true)}/>
             <Paper sx={{ width: '100%', overflow: 'hidden' }}>
                 <TableContainer sx={{ maxHeight: 600 }}>
                 <Table stickyHeader aria-label="sticky table">
@@ -101,12 +121,12 @@ export default function Payments () {
                     <TableBody>
                     {status === 3? filteredData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((payment, index) => {
                         return (
-                            <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                            <TableRow hover role="checkbox" className={payment.expense ? 'bg-red-100' : ''} tabIndex={-1} key={index}>
                             {columns.map((column) => {
                                 const value = payment[column.id] || "No Data";
                                 return (
                                 <TableCell key={column.id} align='center'>
-                                    {column.id === "trainee"? (value.fname || "Unknown") + ' ' + (value.mname || '') + ' ' + (value.lname || 'Unknown'):value}
+                                    {column.id === "trainee"? payment.expense ? payment.note : (value.fname || "Unknown") + ' ' + (value.mname || '') + ' ' + (value.lname || 'Unknown'):value}
                                 </TableCell>
                                 );
                             })}
@@ -131,6 +151,8 @@ export default function Payments () {
                     showLastButton={true}
                 />
             </Paper>
+            <ExpensesDialog open={expenseOpen} setOpen={setExpenseOpen} addExpense={addExpense}/>
+
             <Dialog
                 open={openDelete}
                 onClose={handleClose}

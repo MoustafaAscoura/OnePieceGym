@@ -10,6 +10,7 @@ export async function POST(request) {
   const jsonData = Object.fromEntries(formData);
 
   jsonData.amount = parseInt(jsonData.amount)
+  jsonData.expense = jsonData.expense? true : false
 
   if (jsonData.traineeID) {
     jsonData.traineeID = parseInt(jsonData.traineeID)
