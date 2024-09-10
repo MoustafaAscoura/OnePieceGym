@@ -160,7 +160,6 @@ export default function TraineeDetails({
   };
 
   async function handleSubmit(formData) {
-
     fetch("/api/trainees", {
       method: "POST",
       body: formData,
@@ -239,10 +238,8 @@ export default function TraineeDetails({
         body: formData,
       }).then(response => response.json())
         .then(jsonResponse => {
-
           const d_ = detailTrainee.status === "Membership Expired" ? { ...detailTrainee, ...jsonResponse }
           : {...detailTrainee, payments: [...detailTrainee.payments, jsonResponse]}
-
           const d_serialized = serialize_trainee(d_)
           dispatch(editTrainee(d_serialized))
           const createdAt = new Date(jsonResponse.createdAt)
@@ -303,7 +300,7 @@ export default function TraineeDetails({
       maxWidth="md"
       component='form' 
       onChange={e => handleChange(e)} 
-      onSubmit={e => handleSubmit(e)}
+      // onSubmit={e => handleSubmit(e)}
     >
       <DialogTitle id="scroll-dialog-title">Details</DialogTitle>
       <DialogContent dividers={true}>

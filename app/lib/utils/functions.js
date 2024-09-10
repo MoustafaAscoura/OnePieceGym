@@ -95,7 +95,7 @@ const calculate_total_payment = (trainee) => {
 
     const sub_payments = trainee.payments.filter(pay => {
         let pay_date = new Date(pay.createdAt)
-        return pay_date >= dates_sorted[0]
+        return pay_date >= new Date(dates_sorted[0])
     })
 
     return sub_payments.reduce((acc, curr) => acc + parseInt(curr.amount), 0);
